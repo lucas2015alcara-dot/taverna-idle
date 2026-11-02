@@ -65,6 +65,9 @@ th { color: var(--suave); font-weight: 500; }
 .palco canvas { border-radius: 10px; }
 .arenaBotoes { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
 .arenaBotoes .b { padding: 6px 12px; font-size: 13px; background: rgba(34,29,22,.85); }
+.labCtrl { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: center; font-size: 12px; color: var(--suave); padding: 0 8px; }
+.labCtrl label { display: flex; align-items: center; gap: 6px; }
+.labCtrl input { width: 90px; accent-color: var(--brasa); }
 .gire { margin: 0; color: var(--suave); font-size: 13px; }
 @media (orientation: landscape) { .gire { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -182,6 +185,7 @@ th { color: var(--suave); font-weight: 500; }
           <button class="b" id="bTempo">Avançar 2h</button>
           <button class="b" id="bGemas">+2.000 gemas</button>
           <button class="b" id="bReset">Recomeçar</button>
+          <button class="b" id="bLab">Teste de animação</button>
         </div>
         <p class="aviso" id="avTav"></p>
       </div>`;
@@ -203,6 +207,7 @@ th { color: var(--suave); font-weight: 500; }
     (function loop(n) { desenha((n - t0) / 1000); anim = requestAnimationFrame(loop); })(t0);
     $('#bColeta').onclick = () => { const g = TL.coletaAfk(E); salva(); render(); aviso('#avTav', `Coletado: ${fmt(g.ouro)} ouro e ${fmt(g.xp)} xp.`, true); };
     $('#bTempo').onclick = () => { E.ultimoAfk -= 2 * 3600e3; salva(); render(); };
+    $('#bLab').onclick = () => abreLaboratorio();
     $('#bGemas').onclick = () => { E.gemas += 2000; salva(); render(); };
     $('#bReset').onclick = () => {
       if (!confirmaReset) { confirmaReset = true; $('#bReset').textContent = 'Toque de novo para apagar tudo'; return; }
@@ -251,6 +256,57 @@ th { color: var(--suave); font-weight: 500; }
     };
   }
 
+  // ---------- Animação de ataque corpo a corpo (só a lógica do movimento) ----------
+  // Ajustes: velocidade (1 = 1 segundo), distância do avanço (1 = até o alvo) e intensidade do golpe.
+  const CFG_ATAQUE = { velocidade: 1, distancia: 1, intensidade: 1 };
+  const FASES = { prep: 0.2, avanco: 0.42, golpe: 0.6 }; // frações da duração; o resto é o retorno
+  const MOMENTO_IMPACTO = 0.5;
+  const suave = (k) => k * k * (3 - 2 * k), entra = (k) => k * k * k, sai = (k) => 1 - Math.pow(1 - k, 3);
+  // p: progresso 0..1; alcance: pixels até a posição de golpe. Devolve deslocamento "para a frente", giro e escala.
+  function poseAtaque(p, alcance, cfg) {
+    const I = cfg.intensidade, recuo = 12;
+    if (p < FASES.prep) { const k = suave(p / FASES.prep); return { dx: -recuo * k, rot: -0.14 * I * k, esc: 1 }; }
+    if (p < FASES.avanco) { const k = entra((p - FASES.prep) / (FASES.avanco - FASES.prep)); return { dx: -recuo + (alcance + recuo) * k, rot: -0.14 * I + 0.1 * I * k, esc: 1 + 0.04 * k }; }
+    if (p < FASES.golpe) { const k = sai((p - FASES.avanco) / (FASES.golpe - FASES.avanco)); return { dx: alcance, rot: -0.04 * I + 0.5 * I * k, esc: 1.04 + 0.04 * I * Math.sin(k * Math.PI) }; }
+    const k = suave((p - FASES.golpe) / (1 - FASES.golpe));
+    return { dx: alcance * (1 - k), rot: 0.46 * I * (1 - k), esc: 1 + 0.04 * (1 - k) };
+  }
+
+  // ---------- Efeitos visuais (separados da animação) ----------
+  const COR_GOLPE = { trevas: ['#FF4A3D', '#2B0707'] };
+  function criaEfeitos() {
+    const lista = [];
+    return {
+      golpe(x, y, dir, fac, I) {
+        const [cor, escura] = COR_GOLPE[fac] || [TL.FACCOES[fac].claro, TL.FACCOES[fac].cor];
+        lista.push({ tipo: 'arco', x, y, dir, cor, l: 0.32, max: 0.32, I });
+        const n = Math.round(14 * I);
+        for (let i = 0; i < n; i++) {
+          lista.push({ tipo: 'chama', x: x + (Math.random() - 0.3) * 30 * dir, y: y + (Math.random() - 0.5) * 50,
+            vx: dir * (30 + Math.random() * 90), vy: -40 - Math.random() * 90, r: 3 + Math.random() * 5 * I,
+            cor: Math.random() < 0.55 ? cor : escura, l: 0.45 + Math.random() * 0.35, max: 0.8 });
+        }
+      },
+      desenha(c, dt) {
+        for (let i = lista.length - 1; i >= 0; i--) {
+          const e = lista[i]; e.l -= dt; if (e.l <= 0) { lista.splice(i, 1); continue; }
+          if (e.tipo === 'arco') {
+            const k = 1 - e.l / e.max, raio = (46 + 26 * k) * e.I;
+            const a0 = e.dir > 0 ? -1.3 : Math.PI + 1.3, a1 = e.dir > 0 ? -1.3 + 2.3 * Math.min(1, k * 2.2) : Math.PI + 1.3 - 2.3 * Math.min(1, k * 2.2);
+            c.save(); c.globalCompositeOperation = 'lighter'; c.lineCap = 'round';
+            c.globalAlpha = e.l / e.max; c.strokeStyle = e.cor; c.lineWidth = 12 * e.I;
+            c.beginPath(); c.arc(e.x - e.dir * 20, e.y, raio, a0, a1, e.dir < 0); c.stroke();
+            c.globalAlpha = (e.l / e.max) * 0.9; c.strokeStyle = '#FFE2D6'; c.lineWidth = 3 * e.I;
+            c.beginPath(); c.arc(e.x - e.dir * 20, e.y, raio, a0, a1, e.dir < 0); c.stroke(); c.restore();
+          } else {
+            e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 60 * dt;
+            c.globalAlpha = Math.min(1, e.l / 0.3); bola(c, e.x, e.y, e.r * (0.5 + e.l), e.cor); c.globalAlpha = 1;
+          }
+        }
+      },
+    };
+  }
+
   // ---------- Arena (paisagem 16:9) ----------
   const AW = 640, AH = 360;
   const POS = [[238, 250], [254, 322], [154, 234], [170, 302], [74, 260], [90, 330]];
@@ -264,26 +320,26 @@ th { color: var(--suave); font-weight: 500; }
       const [x, y] = posBase(u.id);
       uni[u.id] = { ...u, x, y, hp: u.hpMax, en: 0, hit: 0, morto: 0, acao: null, brilho: 0, fase: Math.random() * 6 };
     });
-    const nums = [], proj = [], brilhos = [];
+    const nums = [], proj = [], brilhos = [], fx = criaEfeitos();
     let relogio = 0, tremor = 0, banner = null;
     const st = { uni, nums, proj, rodada: 0 };
 
     function desenhaUnidade(c, u) {
       const s = escalaProf(u.y);
-      let dx = 0, dy = 0;
+      let dx = 0, dy = 0, rot = 0, esc = 1;
       const dir = u.id[0] === 'a' ? 1 : -1;
       if (u.acao) {
         const p = Math.min(1, u.acao.t / u.acao.dur);
         if (u.acao.melee && u.acao.alvo) {
-          const destino = u.acao.alvo.x - dir * 55 - u.x, destinoY = u.acao.alvo.y - u.y;
-          const k = p < 0.35 ? p / 0.35 : p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4;
-          const e = k * k * (3 - 2 * k);
-          dx = destino * e; dy = destinoY * e;
+          const alcance = Math.max(0, Math.abs(u.acao.alvo.x - u.x) - 70) * CFG_ATAQUE.distancia;
+          const pose = poseAtaque(p, alcance, CFG_ATAQUE);
+          dx = dir * pose.dx; dy = alcance ? (u.acao.alvo.y - u.y) * (pose.dx / alcance) * 0.8 : 0;
+          rot = pose.rot; esc = pose.esc;
         } else {
           dx = -dir * 8 * Math.sin(Math.min(1, p * 3) * Math.PI);
         }
       }
-      if (u.hit > 0) dx += (Math.random() - 0.5) * 6;
+      if (u.hit > 0) dx += (Math.random() - 0.5) * 6 * (u.tremor || 1);
       const x = u.x + dx, y = u.y + dy;
       const resp = Math.sin(relogio * 2.4 + u.fase);
       c.save();
@@ -301,6 +357,7 @@ th { color: var(--suave); font-weight: 500; }
       if (img && pronta(img)) {
         const h = 108 * s * (1 + resp * 0.012), w = (h * img.naturalWidth) / img.naturalHeight;
         c.translate(x, y + queda); if (dir < 0) c.scale(-1, 1);
+        if (rot || esc !== 1) { c.translate(0, -h * 0.35); c.rotate(rot); c.scale(esc, esc); c.translate(0, h * 0.35); }
         c.drawImage(img, -w / 2, -h, w, h);
         topo = y - h;
       } else if (u.monstro) {
@@ -356,14 +413,15 @@ th { color: var(--suave); font-weight: 500; }
       if (rapido) { ev.golpes.forEach((g) => golpeia(g, true)); ev.curas.forEach((g) => cura(g, true)); return 0; }
       const alvo = ev.golpes.length ? uni[ev.golpes[0].alvo] : null;
       const melee = !!CORPO_A_CORPO[a.funcao] && !!alvo && ev.golpes.length === 1;
-      const dur = ev.hab ? 1.05 : 0.72;
+      const dur = melee ? (ev.hab ? 1.15 : 1) / CFG_ATAQUE.velocidade : ev.hab ? 1.05 : 0.72;
       a.acao = { t: 0, dur, melee, alvo };
       if (ev.hab) { a.brilho = 1; banner = { txt: a.nome + ' · ' + ev.nomeHab, l: 1.3 }; tremor = ev.golpes.length > 1 ? 0.35 : 0.18; }
-      const impacto = melee ? 0.3 : 0.42;
+      const impacto = melee ? dur * MOMENTO_IMPACTO : 0.42;
+      if (melee) pend.push({ em: relogio + impacto, fn: () => { const dirA = a.id[0] === 'a' ? 1 : -1; fx.golpe(alvo.x - dirA * 10, alvo.y - 55, dirA, a.fac, CFG_ATAQUE.intensidade * (ev.hab ? 1.3 : 1)); alvo.tremor = 1 + CFG_ATAQUE.intensidade; } });
       if (!melee) ev.golpes.forEach((g, k) => proj.push({ de: a, para: uni[g.alvo], t: -k * 0.09, dur: 0.38, tipo: a.funcao === 'arqueiro' ? 'arqueiro' : 'magia', fac: a.fac }));
       ev.golpes.forEach((g, k) => pend.push({ em: relogio + impacto + (melee ? 0 : k * 0.09), fn: () => golpeia(g, false) }));
       ev.curas.forEach((g) => pend.push({ em: relogio + 0.45, fn: () => cura(g, false) }));
-      return dur;
+      return melee ? dur * 0.85 : dur;
     }
     const pend = [];
 
@@ -372,7 +430,7 @@ th { color: var(--suave); font-weight: 500; }
       for (let i = pend.length - 1; i >= 0; i--) if (pend[i].em <= relogio) { pend[i].fn(); pend.splice(i, 1); }
       Object.values(uni).forEach((u) => {
         if (u.acao) { u.acao.t += dt; if (u.acao.t >= u.acao.dur) u.acao = null; }
-        u.hit = Math.max(0, u.hit - dt); u.brilho = Math.max(0, u.brilho - dt * 1.2);
+        u.hit = Math.max(0, u.hit - dt); if (u.hit <= 0) u.tremor = 0; u.brilho = Math.max(0, u.brilho - dt * 1.2);
         if (u.hp <= 0 && u.hit <= 0) u.morto = Math.min(1, u.morto + dt);
       });
       c.save();
@@ -380,6 +438,7 @@ th { color: var(--suave); font-weight: 500; }
       if (pronta(FUNDO)) c.drawImage(FUNDO, 0, 0, AW, AH); else rr(c, 0, 0, AW, AH, 0, '#2a4a24');
       Object.values(uni).sort((a, b) => a.y - b.y).forEach((u) => { if (u.morto < 1) desenhaUnidade(c, u); });
       for (let i = proj.length - 1; i >= 0; i--) { const p = proj[i]; p.t += dt; if (p.t >= p.dur) proj.splice(i, 1); else if (p.t > 0) desenhaProj(c, p); }
+      fx.desenha(c, dt);
       for (let i = brilhos.length - 1; i >= 0; i--) { const b = brilhos[i]; b.l -= dt; b.y -= dt * 40; if (b.l <= 0) brilhos.splice(i, 1); else { c.globalAlpha = Math.min(1, b.l); bola(c, b.x, b.y, 3, '#FAC775'); c.globalAlpha = 1; } }
       for (let i = nums.length - 1; i >= 0; i--) {
         const f = nums[i]; f.l -= dt; f.y -= dt * 34; if (f.l <= 0) { nums.splice(i, 1); continue; }
@@ -395,7 +454,7 @@ th { color: var(--suave); font-weight: 500; }
       }
       c.restore();
     }
-    return { desenha, aplica, ocupado: () => pend.length > 0 || proj.length > 0 };
+    return { desenha, aplica, uni, ocupado: () => pend.length > 0 || proj.length > 0 };
   }
 
   function abreBatalha(res) {
@@ -438,6 +497,38 @@ th { color: var(--suave); font-weight: 500; }
       arena.desenha(c, dt);
       anim = requestAnimationFrame(loop);
     })(ult);
+  }
+  // ---------- Laboratório de animação ----------
+  function abreLaboratorio() {
+    pararAnim();
+    const div = document.createElement('div');
+    div.className = 'arena';
+    div.innerHTML = `<div class="palco"><canvas id="cLab" aria-label="Teste de animação"></canvas></div>
+      <div class="labCtrl">
+        <label for="lVel">Velocidade <input id="lVel" type="range" min="0.5" max="2" step="0.1" value="${CFG_ATAQUE.velocidade}"></label>
+        <label for="lDist">Avanço <input id="lDist" type="range" min="0.3" max="1.2" step="0.05" value="${CFG_ATAQUE.distancia}"></label>
+        <label for="lInt">Intensidade <input id="lInt" type="range" min="0.3" max="2" step="0.1" value="${CFG_ATAQUE.intensidade}"></label>
+        <button class="b prim" id="bAtacar">Atacar</button><button class="b" id="bSair">Sair</button>
+      </div>`;
+    document.body.appendChild(div);
+    const cv = $('#cLab');
+    function ajusta() {
+      const w = Math.min(innerWidth - 16, ((innerHeight - 80) * AW) / AH);
+      cv.style.width = w + 'px'; cv.style.height = (w * AH) / AW + 'px';
+    }
+    ajusta(); addEventListener('resize', ajusta);
+    const c = cena(cv, AW, AH);
+    const heroi = { id: 'a0', nome: 'Morgrath', fac: 'trevas', funcao: 'guerreiro', hpMax: 99999, ref: 'morgrath' };
+    const boneco = { id: 'b0', nome: 'Boneco de treino', fac: 'floresta', funcao: 'tanque', hpMax: 99999, monstro: true };
+    const arena = criaArena([heroi], [boneco], false);
+    [['lVel', 'velocidade'], ['lDist', 'distancia'], ['lInt', 'intensidade']].forEach(([id, k]) => ($('#' + id).oninput = (e) => (CFG_ATAQUE[k] = +e.target.value)));
+    $('#bAtacar').onclick = () => {
+      const dano = Math.round(800 + Math.random() * 400 * CFG_ATAQUE.intensidade);
+      arena.aplica({ t: 'acao', de: 'a0', hab: false, golpes: [{ alvo: 'b0', dano, crit: Math.random() < 0.2, vant: false }], curas: [] }, false);
+    };
+    $('#bSair').onclick = () => { pararAnim(); removeEventListener('resize', ajusta); div.remove(); render(); };
+    let ult = performance.now();
+    (function loop(t) { const dt = Math.min(0.05, (t - ult) / 1000); ult = t; arena.desenha(c, dt); anim = requestAnimationFrame(loop); })(ult);
   }
   function pararAnim() { if (anim) cancelAnimationFrame(anim); anim = null; }
 

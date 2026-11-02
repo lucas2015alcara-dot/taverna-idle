@@ -1,0 +1,21 @@
+# Animação
+
+## Versão atual (02/11): sprite inteiro
+- `poseAtaque()` (lógica): preparação 20% → avanço até 42% → golpe até 60% → retorno. Devolve deslocamento, giro e escala; não altera a posição real do herói.
+- `criaEfeitos()` (visual): arco de energia, partículas de chama e tremor no alvo, no momento do impacto (50% da duração).
+- Ajustes em `CFG_ATAQUE`: velocidade, distância do avanço e intensidade. Testar em Taverna → Teste de animação.
+- Vale para todos os heróis corpo a corpo (Guerreiro, Tanque, Assassino); cor do efeito pela facção.
+
+## Para animação esquelética (próximo nível)
+Cada herói precisa ser entregue em **peças separadas**, em PNG com fundo transparente, todas na mesma escala e pose neutra:
+- cabeça, tronco, quadril
+- braço superior e antebraço/mão de cada lado
+- coxa e perna/pé de cada lado
+- arma (espada, arco, cajado) e acessórios soltos (capa, cabelo longo, auréola)
+
+Mais:
+- **Arquivo de esqueleto** (JSON): posição de cada peça, ponto de giro (pivô) de cada articulação e ordem de desenho.
+- **Arquivo de animações** (JSON): para cada animação (parado, ataque, habilidade, dano, morte), os ângulos e posições das peças ao longo do tempo.
+- Ferramenta: DragonBones (grátis) ou Spine (pago) exportam esses dois arquivos; o jogo lê com um leitor próprio ou uma biblioteca de leitura.
+
+Custo: o GPT tem dificuldade de gerar peças que se encaixam perfeitamente. Caminho realista: pedir o herói em pose neutra (braços afastados do corpo) e recortar as peças manualmente num editor, ou contratar um artista só para o recorte.
