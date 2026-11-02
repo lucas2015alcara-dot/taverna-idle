@@ -2,4 +2,5 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Simulador de economia (tools/economia): 200 jogadores grátis por 30 dias. Padrão: 1º 5★ ~dia 7, ~15% chegam a 6★ em 30 dias, ~42 invocações premium/mês | Lucas decidir o ritmo desejado de 5★/6★; depois protótipo cinza |
 | 2026-11-02 | Tema escolhido (A Taverna do Fim do Mundo), teste visual por código, GDD de sistemas, decisões de estrelas/equipe/facções/PvP, repositório criado | Planilha de economia e protótipo cinza |
