@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Aviso "Nova versão disponível" no app (testado simulando uma publicação nova); service worker baixa arquivos frescos. Explicado ao Lucas: atualizações de conteúdo não exigem reinstalar | Lucas gerar os quadros dos outros 5 heróis no GPT |
 | 2026-11-02 | Repositório raiz lucas2015alcara-dot.github.io criado com assetlinks.json (verificação do app) e redirecionamento para o jogo; tela cheia no primeiro toque como paliativo | Lucas reabrir/reinstalar o app e confirmar que a barra sumiu e trava deitado |
 | 2026-11-02 | App Android instalado no celular do Lucas via PWABuilder (fase 3 ok). Correções: trava deitado pelo código + aviso "Gire o celular" no app, taverna com a arte nova, telas ajustadas à paisagem, versão do cache passa a mudar com qualquer alteração | Quadros de ataque dos outros 5 heróis; ultimates; tela principal da taverna |
 | 2026-11-02 | Fase 3 preparada: versão app (game/app.html gerado por tools/gera-app.py), manifesto deitado/tela cheia, ícones, modo offline, redirecionamento na raiz. Guia em docs/PUBLICAR.md. Lucas aprovou a animação por quadros do GPT (padrão) | Lucas ligar o GitHub Pages, gerar no PWABuilder e instalar no celular |

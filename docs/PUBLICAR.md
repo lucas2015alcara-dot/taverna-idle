@@ -42,4 +42,4 @@ Dentro do .zip vem a **chave de assinatura** (arquivo `.keystore`) e um arquivo 
 - Se aparecer um campo **Orientation**, escolha **Landscape**. O jogo já trava deitado sozinho, mas assim fica garantido.
 
 ## Para atualizar o jogo depois
-Não precisa gerar o app de novo para cada mudança: o app abre o site, então basta o Claude atualizar o repositório. Gerar de novo só quando mudar ícone, nome ou na hora de publicar.
+Não precisa gerar o app de novo para cada mudança: o app abre o site, então basta o Claude atualizar o repositório. O app confere se há versão nova ao abrir, ao voltar do segundo plano e a cada 30 minutos; quando há, aparece o aviso "Nova versão disponível — Toque para atualizar". Gerar de novo só quando mudar ícone, nome ou na hora de publicar.

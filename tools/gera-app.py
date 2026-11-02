@@ -37,6 +37,10 @@ html = f'''<!doctype html>
   background: #16130E; color: #EFE7D6; font: 600 22px "Alegreya SC", Georgia, serif; padding: 24px; }}
 #gire small {{ font: 400 14px "Work Sans", system-ui, sans-serif; color: #A99C84; }}
 @media (orientation: portrait) {{ #gire {{ display: flex; }} }}
+#novaVersao {{ position: fixed; z-index: 98; left: 50%; transform: translateX(-50%); bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  display: flex; gap: 10px; align-items: center; padding: 10px 16px; border-radius: 999px; border: 1px solid #E0B54A;
+  background: #2C261D; color: #EFE7D6; font: 500 14px "Work Sans", system-ui, sans-serif; cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,.45); }}
+#novaVersao b {{ color: #E0B54A; font-weight: 600; }}
 </style>
 <script>
 // trava a tela deitada no app instalado; no navegador comum, o aviso "Gire o celular" cobre a tela em pé
@@ -55,7 +59,22 @@ html = f'''<!doctype html>
   document.addEventListener('fullscreenchange', trava);
   document.addEventListener('visibilitychange', () => {{ if (!document.hidden) trava(); }});
 }})();
-if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {{}}));
+// atualização: quando uma versão nova do jogo assume, mostra um aviso para recarregar
+if ('serviceWorker' in navigator) addEventListener('load', () => {{
+  const tinhaVersao = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js').then((reg) => {{
+    document.addEventListener('visibilitychange', () => {{ if (!document.hidden) reg.update().catch(() => {{}}); }});
+    setInterval(() => reg.update().catch(() => {{}}), 30 * 60 * 1000);
+  }}).catch(() => {{}});
+  navigator.serviceWorker.addEventListener('controllerchange', () => {{
+    if (!tinhaVersao || document.getElementById('novaVersao')) return;
+    const b = document.createElement('button');
+    b.id = 'novaVersao'; b.type = 'button';
+    b.innerHTML = 'Nova versão disponível <b>Toque para atualizar</b>';
+    b.onclick = () => location.reload();
+    document.body.appendChild(b);
+  }});
+}});
 </script>
 </body>
 </html>
@@ -64,7 +83,7 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
 sw = f'''// gerado por tools/gera-app.py — não editar à mão
 const CACHE = 'taverna-{h}';
 const ARQUIVOS = {json.dumps(['./'] + arquivos + ['icones/icone-192.png', 'icones/icone-512.png'], ensure_ascii=False)};
-self.addEventListener('install', (e) => {{ e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARQUIVOS)).then(() => self.skipWaiting())); }});
+self.addEventListener('install', (e) => {{ e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARQUIVOS.map((u) => new Request(u, {{ cache: 'reload' }})))).then(() => self.skipWaiting())); }});
 self.addEventListener('activate', (e) => {{ e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); }});
 self.addEventListener('fetch', (e) => {{
   if (e.request.method !== 'GET') return;
