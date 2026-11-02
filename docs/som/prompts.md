@@ -20,3 +20,10 @@ Nomes de arquivo sugeridos entre parênteses. Formato: MP3.
 - vitoria (2 s): Short victory fanfare, brass and bells, cartoon RPG.
 - derrota (1,5 s): Short sad defeat jingle, descending strings.
 - botao (0,2 s): Soft wooden button click for a game UI.
+
+## Efeitos novos (telas de heróis, invocação e campanha)
+- virar-carta (0,4 s): Quick card flip, paper swoosh with a light magical sparkle, mobile game.
+- revelacao-5 (2 s): Legendary reward reveal, golden shimmering burst, choir "ahh" and bright bells, epic but short.
+- subir-nivel (0,8 s): Level up chime, rising sparkly arpeggio, cheerful cartoon RPG.
+- evoluir (1,5 s): Hero evolution power-up, magical energy swirl rising into a bright golden burst.
+- portal-carga (1,2 s): Magic portal charging up, swirling energy rising in pitch, then a soft burst.
