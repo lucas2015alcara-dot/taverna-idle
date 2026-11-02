@@ -65,9 +65,9 @@ th { color: var(--suave); font-weight: 500; }
 .palco canvas { border-radius: 10px; }
 .arenaBotoes { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
 .arenaBotoes .b { padding: 6px 12px; font-size: 13px; background: rgba(34,29,22,.85); }
-.labCtrl { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: center; font-size: 12px; color: var(--suave); padding: 0 8px; }
+.labCtrl { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: center; font-size: 12px; color: var(--suave); padding: 0 8px; }
 .labCtrl label { display: flex; align-items: center; gap: 6px; }
-.labCtrl input { width: 90px; accent-color: var(--brasa); }
+.labCtrl input { width: 70px; accent-color: var(--brasa); }
 .labCtrl select { font: inherit; background: var(--painel2); color: var(--texto); border: 1px solid var(--linha); border-radius: 8px; padding: 4px 6px; }
 .gire { margin: 0; color: var(--suave); font-size: 13px; }
 @media (orientation: landscape) { .gire { display: none; } }
@@ -193,6 +193,7 @@ th { color: var(--suave); font-weight: 500; }
           <button class="b" id="bGemas">+2.000 gemas</button>
           <button class="b" id="bReset">Recomeçar</button>
           <button class="b" id="bLab">Teste de animação</button>
+          <button class="b" id="bMorg">Pôr Morgrath na equipe</button>
         </div>
         <p class="aviso" id="avTav"></p>
       </div>`;
@@ -215,6 +216,18 @@ th { color: var(--suave); font-weight: 500; }
     $('#bColeta').onclick = () => { const g = TL.coletaAfk(E); salva(); render(); aviso('#avTav', `Coletado: ${fmt(g.ouro)} ouro e ${fmt(g.xp)} xp.`, true); };
     $('#bTempo').onclick = () => { E.ultimoAfk -= 2 * 3600e3; salva(); render(); };
     $('#bLab').onclick = () => abreLaboratorio();
+    $('#bMorg').onclick = () => {
+      let m = E.herois.find((h) => h.def === 'morgrath');
+      if (!m) m = TL.criaHeroi(E, 'morgrath', 5);
+      if (!E.equipe.includes(m.uid)) {
+        if (E.equipe.length >= 6) {
+          const fraco = [...E.equipe].sort((a, b) => TL.poder(TL.heroi(E, a)) - TL.poder(TL.heroi(E, b)))[0];
+          E.equipe = E.equipe.filter((u) => u !== fraco);
+        }
+        E.equipe.push(m.uid);
+      }
+      salva(); render(); aviso('#avTav', 'Morgrath está na sua equipe. Vá em Campanha e lute.', true);
+    };
     $('#bGemas').onclick = () => { E.gemas += 2000; salva(); render(); };
     $('#bReset').onclick = () => {
       if (!confirmaReset) { confirmaReset = true; $('#bReset').textContent = 'Toque de novo para apagar tudo'; return; }
@@ -265,7 +278,7 @@ th { color: var(--suave); font-weight: 500; }
 
   // ---------- Animação de ataque corpo a corpo (só a lógica do movimento) ----------
   // Ajustes: velocidade (1 = 1 segundo), distância do avanço (1 = até o alvo) e intensidade do golpe.
-  const CFG_ATAQUE = { velocidade: 1, distancia: 1, intensidade: 1, modo: 'codigo' }; // modo: 'codigo' ou 'quadros'
+  const CFG_ATAQUE = { velocidade: 1, distancia: 1, intensidade: 1, modo: 'quadros' }; // modo: 'codigo' ou 'quadros'
   const FASES = { prep: 0.2, avanco: 0.42, golpe: 0.6 }; // frações da duração; o resto é o retorno
   const MOMENTO_IMPACTO = 0.5;
   const suave = (k) => k * k * (3 - 2 * k), entra = (k) => k * k * k, sai = (k) => 1 - Math.pow(1 - k, 3);
@@ -541,7 +554,7 @@ th { color: var(--suave); font-weight: 500; }
     document.body.appendChild(div);
     const cv = $('#cLab');
     function ajusta() {
-      const w = Math.min(innerWidth - 16, ((innerHeight - 80) * AW) / AH);
+      const w = Math.min(innerWidth - 16, ((innerHeight - 96) * AW) / AH);
       cv.style.width = w + 'px'; cv.style.height = (w * AH) / AW + 'px';
     }
     ajusta(); addEventListener('resize', ajusta);

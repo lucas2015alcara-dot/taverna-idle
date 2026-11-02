@@ -425,7 +425,7 @@
   const API = {
     FACCOES, FAC_COMUNS, VENCE, FUNCOES, RARIDADES, CAMPEOES, DEFS, NIVEL_MAX, ESTRELA_MAX, TOTAL_FASES,
     CHANCE_COMUM, CHANCE_PREMIUM, CUSTO_PREMIUM, PITY, AFK_MAX_MIN,
-    temVantagem, atributos, poder, custoNivel, novoEstado, heroi, autoEquipe, posicoes,
+    temVantagem, atributos, poder, custoNivel, novoEstado, criaHeroi, heroi, autoEquipe, posicoes,
     infoFase, inimigosDaFase, recompensaFase, montaLado, batalha, lutarFase,
     taxaAfk, afkPendente, coletaAfk, podeSubir, subirNivel, invocar, chancesDetalhadas,
     forcaFase, ajustaFases: (k) => Object.assign(K, k),
