@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Kit visual: 16 ícones do GPT (recursos, estrelas, brasões, poder, engrenagem) em game/assets/ui; fontes Lilita One + Nunito embutidas (offline); painéis e botões de madeira com moldura dourada; barra de recursos e navegação com ícones; fontes novas também na batalha | Telas: lista de heróis, ficha do herói, evolução, invocação com animação; som em paralelo |
 | 2026-11-02 | Tela principal da taverna com a ilustração do GPT: áreas clicáveis (portal → Invocar, taverna/baú → coletar AFK, portão → Campanha, quartel → Heróis; Torre e Loja em breve), etiquetas, selo de ganhos AFK, brilho no portal e no baú, ferramentas do protótipo na engrenagem | Som e música (prompts do ElevenLabs) |
 | 2026-11-02 | Batalha ocupa a tela inteira em qualquer proporção (16:9 a 21:9+): largura lógica da arena se adapta, cenário corta mais o céu, formação centralizada e times levemente afastados em telas largas | Tela principal da taverna (prompt do GPT) |
 | 2026-11-02 | Ultimates dos 6 heróis com quadros e efeitos do GPT (flecha, onda, barreira, fumaça, luz, rachadura). Vex agora salta como o Morgrath; Brutus golpeia do lugar | Tela principal da taverna com áreas clicáveis; depois som |

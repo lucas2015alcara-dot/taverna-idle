@@ -181,6 +181,13 @@ Ganhos idle pela fase mais alta vencida, acumulando até 12 horas. Coleta rápid
 
 6 heróis, um por facção: Fen (Floresta, Arqueiro, Raro), Brutus (Fortaleza, Tanque, Épico), Ondina (Abismo, Mago, Raro), Vex (Sombra, Assassino, Épico), Irmã Rosa (Luz, Suporte, Lendário), Morgrath (Trevas, Guerreiro, Mítico). Mais recrutas genéricos 1★–4★ por facção comum como material de fusão. Inclui: taverna com AFK, campanha de 30 fases (chefe a cada 10), combate por turnos com vantagem de facção, subir nível, evolução por fusão, invocação comum/premium com garantia e tabela de chances, salvamento local.
 
+## Kit visual (02/11)
+
+- Fontes: Lilita One (títulos, números, botões) e Nunito (textos), embutidas no jogo.
+- Cores: madeira escura da taverna, molduras douradas, texto creme; botão principal laranja-dourado com contorno.
+- Ícones do GPT em `game/assets/ui`: ouro, xp, gema, pergaminho comum/premium, estrela, estrela especial, baú, 6 brasões de facção, poder, engrenagem.
+- Regra: toda tela nova usa esses painéis, botões e ícones.
+
 ## Ideias para depois
 
 - Calibrar velocidade e quem começa o turno (hoje o jogador sempre começa).
