@@ -43,3 +43,9 @@ Dentro do .zip vem a **chave de assinatura** (arquivo `.keystore`) e um arquivo 
 
 ## Para atualizar o jogo depois
 Não precisa gerar o app de novo para cada mudança: o app abre o site, então basta o Claude atualizar o repositório. O app confere se há versão nova ao abrir, ao voltar do segundo plano e a cada 30 minutos; quando há, aparece o aviso "Nova versão disponível — Toque para atualizar". Gerar de novo só quando mudar ícone, nome ou na hora de publicar.
+
+## Outras lojas e testes (pesquisa de 02/11/2026)
+- Desde 30/09/2026 (Brasil na primeira fase), celulares Android certificados só instalam apps de desenvolvedores verificados pelo Google, venha o app de qualquer loja ou APK. Conta completa: US$ 25. Conta gratuita (estudante/hobby): até 20 aparelhos.
+- Xiaomi GetApps pede verificação com documentos; Samsung Galaxy Store exige status de vendedor comercial e DUNS. Amazon fechou a loja para celulares Android em 2025.
+- Teste grátis: mandar o link do GitHub Pages e instalar pelo Chrome ("Adicionar à tela inicial"); não é APK, não depende da verificação.
+- Portais web (Playgama, CrazyGames, GameDistribution, itch.io): exigem versão própria com o SDK do portal e sem invocação paga. Fica para depois.
