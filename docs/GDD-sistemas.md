@@ -14,6 +14,7 @@ Idle RPG mobile de coleção de heróis, em fantasia medieval com tom equilibrad
 - **Status:** pré-produção. Este documento define os sistemas antes de história e arte.
 - **Orientação:** celular deitado (paisagem), como Idle Heroes (decidido em 02/11).
 - **Tela principal:** ilustração do vilarejo (feita em 02/11) com áreas clicáveis: portal = Invocar, taverna/baú = ganhos AFK, portão = Campanha, quartel = Heróis, torre = Torre da Fenda (em breve), barraca = Loja (em breve).
+- **Fluxo de arte da interface:** o visual é decidido no GPT (mockup a partir de print do jogo) e vem como peças separadas em fundo branco (molduras, placas, botões), aplicadas no jogo como imagens esticáveis. Originais em `docs/arte/originais/`.
 - **Tela de heróis:** grade de cartas (borda na cor da raridade, brasão da facção, estrelas, nível, selo "Equipe") com filtro por facção. Ficha do herói: arte grande, setas para navegar entre heróis, atributos, subir nível (1 ou +10), ultimate e evolução com as cartas que serão consumidas escolhidas automaticamente (recrutas e mais fracos primeiro, equipe por último).
 - **Batalha:** 6 heróis agrupados à esquerda (2 frente + 4 atrás, em diagonal), inimigos à direita, cenário ilustrado ao fundo.
 - **Arte:** imagens inteiras do GPT (cenários, tela principal, heróis) animadas por código; teste em `docs/arte/prompts-teste.md`.
