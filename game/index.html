@@ -321,7 +321,7 @@ th { color: var(--suave); font-weight: 500; }
       uni[u.id] = { ...u, x, y, hp: u.hpMax, en: 0, hit: 0, morto: 0, acao: null, brilho: 0, fase: Math.random() * 6 };
     });
     const nums = [], proj = [], brilhos = [], fx = criaEfeitos();
-    let relogio = 0, tremor = 0, banner = null;
+    let relogio = 0, tremor = 0, banner = null, vez = null;
     const st = { uni, nums, proj, rodada: 0 };
 
     function desenhaUnidade(c, u) {
@@ -408,6 +408,7 @@ th { color: var(--suave); font-weight: 500; }
     // aplica um evento; devolve quanto tempo ele ocupa
     function aplica(ev, rapido) {
       if (ev.t === 'rodada') { st.rodada = ev.n; return 0.05; }
+      if (ev.t === 'lado') { if (!rapido) vez = { txt: ev.lado === 0 ? 'Sua equipe ataca' : 'Vez dos inimigos', cor: ev.lado === 0 ? '#7FCB8F' : '#EE8A7E', l: 0.9 }; return rapido ? 0 : 0.45; }
       const a = uni[ev.de];
       if (ev.hab) { a.en = 0; } else a.en = Math.min(100, a.en + 50);
       if (rapido) { ev.golpes.forEach((g) => golpeia(g, true)); ev.curas.forEach((g) => cura(g, true)); return 0; }
@@ -446,7 +447,12 @@ th { color: var(--suave); font-weight: 500; }
         c.lineWidth = 4; c.strokeStyle = 'rgba(20,12,6,.9)'; c.strokeText(f.txt, f.x, f.y); c.fillStyle = f.cor; c.fillText(f.txt, f.x, f.y); c.globalAlpha = 1;
       }
       if (real) {
-        rr(c, 10, 10, 98, 24, 8, 'rgba(16,13,9,.7)'); c.fillStyle = '#EFE7D6'; c.font = '600 13px "Work Sans", sans-serif'; c.textAlign = 'left'; c.fillText('Rodada ' + st.rodada + '/15', 20, 27);
+        rr(c, 10, 10, 98, 24, 8, 'rgba(16,13,9,.7)'); c.fillStyle = '#EFE7D6'; c.font = '600 13px "Work Sans", sans-serif'; c.textAlign = 'left'; c.fillText('Turno ' + st.rodada + '/15', 20, 27);
+      }
+      if (vez && vez.l > 0) {
+        vez.l -= dt; c.globalAlpha = Math.min(1, vez.l * 3);
+        c.font = '700 22px "Alegreya SC", Georgia, serif'; c.textAlign = 'center'; c.lineWidth = 5; c.strokeStyle = 'rgba(16,13,9,.9)';
+        c.strokeText(vez.txt, AW / 2, 120); c.fillStyle = vez.cor; c.fillText(vez.txt, AW / 2, 120); c.globalAlpha = 1;
       }
       if (banner && banner.l > 0) {
         banner.l -= dt; c.globalAlpha = Math.min(1, banner.l * 2.5);

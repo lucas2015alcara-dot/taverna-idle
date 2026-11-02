@@ -213,8 +213,7 @@
     const r = criaRng(seed);
     const A = time.map((u, i) => ({ ...u, id: 'a' + i }));
     const B = inimigos.map((m, i) => ({ ...unidade(1, i, m), id: 'b' + i }));
-    const todos = [...A, ...B];
-    const eventos = [];
+        const eventos = [];
     const vivos = (l) => l.filter((u) => u.hp > 0);
     const inimigosDe = (u) => vivos(u.lado === 0 ? B : A);
     const aliadosDe = (u) => vivos(u.lado === 0 ? A : B);
@@ -240,9 +239,14 @@
     while (rodada < 15 && vivos(A).length && vivos(B).length) {
       rodada++;
       eventos.push({ t: 'rodada', n: rodada });
-      const ordem = vivos(todos).sort((a, b) => b.vel - a.vel || r() - 0.5);
-      for (const u of ordem) {
+      // turnos por equipe: primeiro toda a equipe do jogador, depois toda a equipe inimiga.
+      // Dentro de cada equipe, quem tem mais velocidade age primeiro.
+      const ordemDe = (l) => vivos(l).sort((a, b) => b.vel - a.vel || r() - 0.5);
+      const ordem = [...ordemDe(A).map((u) => ['A', u]), ...ordemDe(B).map((u) => ['B', u])];
+      let ladoAtual = null;
+      for (const [lado, u] of ordem) {
         if (u.hp <= 0) continue;
+        if (lado !== ladoAtual) { ladoAtual = lado; eventos.push({ t: 'lado', lado: lado === 'A' ? 0 : 1 }); }
         if (!vivos(A).length || !vivos(B).length) break;
         if (u.escudo > 0) u.escudo--;
         const ev = { t: 'acao', de: u.id, hab: false, golpes: [], curas: [] };

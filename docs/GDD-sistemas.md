@@ -81,7 +81,7 @@ Limite de estrelas por origem: 1★–3★ vão até 4★; 4★ vai até 5★; s
 
 ## Combate
 
-Batalha automática por turnos, equipe de **6 heróis: 2 na frente e 4 atrás**. Maior Velocidade age primeiro.
+Batalha automática por turnos, equipe de **6 heróis: 2 na frente e 4 atrás**. **Turnos por equipe** (decidido em 02/11): em cada turno, toda a equipe do jogador ataca e depois toda a equipe inimiga; dentro de cada equipe, maior Velocidade age primeiro. A ultimate dispara sozinha quando a energia chega a 100.
 
 - **Turno:** ataque básico + 50 de energia; com 100 de energia, usa a habilidade ativa.
 - **Habilidades:** 1 ativa + 2 passivas, liberadas ao subir de estrela.

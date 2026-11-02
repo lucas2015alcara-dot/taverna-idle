@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Combate mudado para turnos por equipe (jogador inteiro, depois inimigos), com aviso de vez na tela; ultimate automática mantida. Ritmo da campanha praticamente igual no teste | Lucas testar; monstros e recrutas do GPT |
 | 2026-11-02 | Animação de ataque corpo a corpo com sprite inteiro (preparação, avanço, golpe com giro, arco de energia, chamas, tremor, retorno), ajustável; tela Teste de animação com Morgrath. Requisitos de animação esquelética em docs/arte/animacao.md | Lucas testar e ajustar os controles; gerar monstros e recrutas no GPT |
 | 2026-11-02 | Arte provisória do GPT: 6 heróis + cenário Clareira da Fenda (originais em docs/arte/originais, recortados em game/assets). Batalha refeita em paisagem (16:9, tela cheia) com animação por código: respiração, avanço corpo a corpo, flechas e magias, piscar ao levar dano, tremor nas habilidades, morte com queda | Lucas jogar e avaliar; depois upgrade de arte (monstros, tela principal) |
 | 2026-11-02 | Referências do Idle Heroes analisadas. Decidido: celular deitado, tela principal com áreas clicáveis, batalha com heróis agrupados à esquerda. Prompts de teste de arte escritos | Lucas gerar Fen + cenário no GPT; depois refazer o layout em paisagem |
