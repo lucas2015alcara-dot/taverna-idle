@@ -37,3 +37,25 @@ GPT gera as imagens; o código fica com o Claude neste repositório (evita duas 
 3. Primeiro teste jogado
 4. +10 fases, chefe, animação de invocação
 5. Ficha de herói, evolução e demais telas
+
+## Monstros (estilo mais simples, virados para a esquerda)
+
+Agora vamos fazer os monstros, num estilo mais simples que os heróis (menos detalhes, formas arredondadas, mas o mesmo traço e cores). Cada um sozinho, corpo inteiro, virado para a esquerda, fundo branco liso, imagem quadrada, sem texto.
+1. Espinhoso (Floresta): criatura-arbusto baixinha com espinhos e olhos amarelos, cuspindo sementes.
+2. Golem de Pedra (Fortaleza): golem atarracado de pedras cinzas com musgo e runas apagadas.
+3. Lodo Abissal (Abismo): gosma azul-escura translúcida com bolhas e um olho grande no meio.
+4. Espectro (Sombra): fantasma roxo encapuzado, sem pernas, com garras finas.
+5. Sentinela Caída (Luz): armadura dourada vazia e rachada, flutuando, com luz fraca saindo das frestas.
+6. Cria da Fenda (Trevas): demônio pequeno vermelho e preto, com chifres e cauda, sorriso cheio de dentes.
+
+## Recrutas (1 por facção comum; estrelas diferenciadas por código)
+
+Agora 4 recrutas comuns, ainda mais simples que os monstros: soldados iniciantes, sem nada de especial, cara simpática, equipamento básico. Cada um sozinho, corpo inteiro, virado para a direita, fundo branco liso, imagem quadrada, sem texto.
+1. Recruta da Floresta: caçador com arco curto e roupa verde simples.
+2. Recruta da Fortaleza: soldado com elmo de ferro, espada curta e escudo redondo de madeira.
+3. Recruta do Abismo: aprendiz de mago com túnica azul e varinha.
+4. Recruta da Sombra: ladrãozinho com capuz cinza-roxo e uma adaga.
+
+## Animação (a testar)
+
+Comparar com 1 herói: (a) sprite sheet quadro a quadro gerada no GPT; (b) 2–3 poses-chave (parado, ataque, dano) com transição por código.
