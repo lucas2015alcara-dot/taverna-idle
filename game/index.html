@@ -58,7 +58,7 @@ th { color: var(--suave); font-weight: 500; }
 .sobre { position: relative; }
 .faixa { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(16, 13, 9, .78); border-radius: 12px; text-align: center; padding: 12px; }
 .faixa h2 { font-size: 26px; }
-@media (orientation: landscape) { .app, nav .itens { max-width: 920px; } }
+@media (orientation: landscape) { .app, nav .itens { max-width: 920px; } #cTav, #cPrev { width: auto; height: 52vh; max-width: 100%; align-self: center; } }
 .arena { position: fixed; inset: 0; z-index: 30; background: #0B0907; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
 .palco { position: relative; }
@@ -209,7 +209,14 @@ th { color: var(--suave); font-weight: 500; }
       c.strokeStyle = '#AFA9EC'; c.lineWidth = 2; c.beginPath(); c.moveTo(58, 44); c.lineTo(64, 54); c.lineTo(60, 62); c.stroke();
       rr(c, 120, 14, 120, 34, 6, '#2a190b'); c.fillStyle = '#FAC775'; c.font = '600 12px "Alegreya SC", serif'; c.textAlign = 'center'; c.fillText('A Taverna do Fim do Mundo', 180, 36);
       const f = Math.sin(t * 8) * 3; rr(c, 280, 70, 60, 50, 4, '#444441'); bola(c, 310, 100 - f / 2, 10 + f / 3, '#EF9F27'); bola(c, 310, 104, 6, '#FAC775');
-      eq.forEach((h, i) => { const d = TL.DEFS[h.def]; desenhaHeroi(c, 40 + i * 56, 182, 0.72, d, t, false); });
+      eq.forEach((h, i) => {
+        const d = TL.DEFS[h.def], im = imgDef(h.def), x = 40 + i * 56, y = 212;
+        if (im && pronta(im)) {
+          const alt = (d.recruta ? 62 : 74) * (1 + Math.sin(t * 2.4 + i) * 0.012), w = (alt * im.naturalWidth) / im.naturalHeight;
+          c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(x, y, 20, 5, 0, 0, 7); c.fill();
+          c.drawImage(im, x - w / 2, y - alt, w, alt);
+        } else desenhaHeroi(c, x, 182, 0.72, d, t, false);
+      });
     }
     pararAnim(); const t0 = performance.now();
     (function loop(n) { desenha((n - t0) / 1000); anim = requestAnimationFrame(loop); })(t0);

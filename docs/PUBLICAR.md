@@ -36,5 +36,10 @@ Dentro do .zip vem a **chave de assinatura** (arquivo `.keystore`) e um arquivo 
 - Pode aparecer uma **barra de endereço** do navegador no topo. É normal neste teste: some quando colocarmos o arquivo `assetlinks.json` na raiz do domínio. No GitHub Pages isso exige um segundo repositório chamado `lucas2015alcara-dot.github.io` (ou um domínio próprio). Fazemos isso perto da publicação.
 - Funciona sem internet depois de aberto uma vez (as fontes podem trocar pela fonte padrão offline).
 
+## Na próxima vez que gerar o app
+- Use o link direto: https://lucas2015alcara-dot.github.io/taverna-idle/game/app.html
+- Apague o campo **Monochrome icon URL** e use **BR** em Key country code.
+- Se aparecer um campo **Orientation**, escolha **Landscape**. O jogo já trava deitado sozinho, mas assim fica garantido.
+
 ## Para atualizar o jogo depois
 Não precisa gerar o app de novo para cada mudança: o app abre o site, então basta o Claude atualizar o repositório. Gerar de novo só quando mudar ícone, nome ou na hora de publicar.

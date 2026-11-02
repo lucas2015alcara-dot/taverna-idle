@@ -16,7 +16,7 @@ for padrao in (r'<link rel="preconnect"[^>]*>\n?', r'<link rel="stylesheet"[^>]*
         cabeca_extra.append(m.group(0).strip()); corpo = corpo.replace(m.group(0), '', 1)
 # versão do cache = hash dos arquivos do jogo
 arquivos = ['app.html', 'logic.js', 'manifest.webmanifest'] + sorted('assets/' + p.name for p in (jogo / 'assets').iterdir())
-h = hashlib.sha1((corpo + (jogo / 'logic.js').read_text(encoding='utf-8')).encode()).hexdigest()[:10]
+h = hashlib.sha1(((jogo / 'index.html').read_text(encoding='utf-8') + (jogo / 'logic.js').read_text(encoding='utf-8') + pathlib.Path(__file__).read_text(encoding='utf-8')).encode()).hexdigest()[:10]
 html = f'''<!doctype html>
 <html lang="pt-BR">
 <head>
@@ -31,7 +31,21 @@ html = f'''<!doctype html>
 </head>
 <body>
 {corpo.strip()}
+<div id="gire" aria-live="polite"><div>Gire o celular<br><small>A Taverna se joga deitada.</small></div></div>
+<style>
+#gire {{ position: fixed; inset: 0; z-index: 99; display: none; align-items: center; justify-content: center; text-align: center;
+  background: #16130E; color: #EFE7D6; font: 600 22px "Alegreya SC", Georgia, serif; padding: 24px; }}
+#gire small {{ font: 400 14px "Work Sans", system-ui, sans-serif; color: #A99C84; }}
+@media (orientation: portrait) {{ #gire {{ display: flex; }} }}
+</style>
 <script>
+// trava a tela deitada no app instalado; no navegador comum, o aviso "Gire o celular" cobre a tela em pé
+(function () {{
+  const trava = () => {{ try {{ const p = screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); if (p && p.catch) p.catch(() => {{}}); }} catch (_) {{}} }};
+  trava();
+  addEventListener('pointerdown', trava, {{ once: true }});
+  document.addEventListener('visibilitychange', () => {{ if (!document.hidden) trava(); }});
+}})();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {{}}));
 </script>
 </body>
