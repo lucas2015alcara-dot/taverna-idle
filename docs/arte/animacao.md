@@ -44,3 +44,12 @@ Se vier consistente: recortar os 4 quadros, alinhar pelos pés e comparar com a 
 | Morgrath | Golpe Brutal | Rachadura de fogo escuro no chão |
 
 Monstros: uma "fúria" simples por tipo.
+
+## Quadros de ataque dos outros heróis (prompts enviados em 02/11)
+Anexar a imagem original do herói e pedir 4 quadros numa linha, mesma escala, pés na mesma altura, virado para a direita, fundo branco, sem efeitos (efeitos são por código).
+- Brutus: preparação com escudo / investida / martelo descendo / defesa.
+- Vex: agachado / investida / corte em X / adagas abertas.
+- Fen (tiro): pega flecha / encaixa / arco puxado / após soltar.
+- Ondina (feitiço): junta energia / gira / lança / recupera.
+- Irmã Rosa (bênção): reza / ergue a mão / mão no alto / recupera.
+Pendente no código: usar quadros também em ataques à distância e curas (hoje só corpo a corpo).
