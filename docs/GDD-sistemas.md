@@ -134,6 +134,14 @@ Heróis sem uso viram fragmentos para a loja da taverna.
 | Pergaminho premium | Marcos da campanha, eventos | Invocação premium |
 | Fragmentos | Reciclar heróis | Loja da taverna |
 
+### Eventos e calendário (decidido em 02/11)
+
+- **Evento semanal:** ao fim de cada semana, 2 pergaminhos premium e 300 gemas.
+- **Calendário de login (30 dias):** 1 pergaminho premium nos dias 5, 10, 15, 20 e 25; 30 gemas nos demais dias; no dia 30, um herói 5★ aleatório.
+- **Ritmo base um pouco mais generoso:** 180 gemas por dia.
+
+Resultado no simulador (`tools/economia`, jogador grátis): 1º herói 5★ por volta do dia 5; cerca de 50% chegam a um 6★ em 30 dias e quase todos em 60 dias; cerca de 66 invocações premium por mês.
+
 ## Ganhos idle e modos de jogo
 
 Ganhos idle pela fase mais alta vencida, acumulando até 12 horas. Coleta rápida de 2 horas: grátis 1x/dia, depois por gemas.
@@ -157,7 +165,7 @@ Ganhos idle pela fase mais alta vencida, acumulando até 12 horas. Coleta rápid
 ### Próximos passos da pré-produção
 
 1. ~~Criar o repositório no GitHub~~ (feito em 02/11).
-2. Planilha de economia: simular os primeiros 30 dias.
+2. ~~Simulador de economia dos primeiros 30 dias~~ (feito em 02/11).
 3. Protótipo cinza (arte de código): 10 heróis de teste, combate com facções, invocação e fusão.
 4. Testar GitHub Pages → PWABuilder → instalar no celular.
 5. Só então: história, lista final de heróis e ficha de estilo para o GPT.

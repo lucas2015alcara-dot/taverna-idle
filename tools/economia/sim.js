@@ -5,10 +5,16 @@
     dias: 30,
     jogadores: 200,
     pergComumDia: 5,
-    gemasDia: 150,
+    gemasDia: 180,
     custoPremium: 250,
     premiumGratisDia: 0.5,
     pergPremiumDia: 0.3,
+    eventoPremiumSemana: 2, // evento semanal: pergaminhos premium entregues no dia 7, 14, 21...
+    eventoGemasSemana: 300,
+    calendario: true, // calendário de login de 30 dias
+    calendarioGemasDia: 30, // dias comuns do calendário
+    calendarioPremiumDias: [5, 10, 15, 20, 25], // dias com 1 pergaminho premium
+    calendario5Estrelas: 'aleatorio', // dia 30: herói 5★ — 'aleatorio', 'escolha' ou false
     comum: { 1: 40, 2: 35, 3: 20, 4: 4.5, 5: 0.5 },
     premium: { 3: 60, 4: 35, 5: 5 },
     luzTrevasNoPremium5: 12, // % dos 5★ da premium que são Luz/Trevas (0,6% de 5%)
@@ -153,6 +159,18 @@
       premFrac += cfg.premiumGratisDia + cfg.pergPremiumDia;
       let prem = Math.floor(premFrac);
       premFrac -= prem;
+      if (d % 7 === 0) { prem += cfg.eventoPremiumSemana; gemas += cfg.eventoGemasSemana; }
+      const dc = ((d - 1) % 30) + 1;
+      if (cfg.calendario) {
+        if (cfg.calendarioPremiumDias.includes(dc)) prem++;
+        else if (dc !== 30) gemas += cfg.calendarioGemasDia;
+        if (dc === 30 && cfg.calendario5Estrelas) {
+          // jogador escolhe o 5★ de origem 5★ que mais ajuda: o que ele já tem mais cópias
+          const meus = lista(inv).filter((h) => h.orig === 5 && h.est === 5 && h.fac < 4).sort((a, b) => b.q - a.q);
+          const h = cfg.calendario5Estrelas === 'escolha' && meus.length ? meus[0] : heroiAleatorio(cfg, 5, r, false);
+          add(inv, h.fac, 5, h.id, 5);
+        }
+      }
       while (gemas >= cfg.custoPremium) { gemas -= cfg.custoPremium; prem++; }
       for (let i = 0; i < prem; i++) {
         nPrem++;

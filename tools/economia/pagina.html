@@ -54,7 +54,7 @@ button { font: inherit; font-weight: 600; border-radius: 8px; padding: 10px 16px
   <header>
     <div class="tag">Taverna Idle · pré-produção</div>
     <h1>Simulador da Taverna</h1>
-    <p class="sub">Simula 200 jogadores que não gastam dinheiro, jogando todos os dias. Mude os números e veja quanto tempo leva para ter heróis 5★ e o primeiro 6★.</p>
+    <p class="sub">Simula 200 jogadores que não gastam dinheiro, jogando todos os dias, com evento semanal e calendário de login. Mude os números e veja quanto tempo leva para ter heróis 5★ e o primeiro 6★.</p>
   </header>
 
   <section class="resumo" aria-label="Resumo">
@@ -93,6 +93,15 @@ button { font: inherit; font-weight: 600; border-radius: 8px; padding: 10px 16px
         </div>
       </fieldset>
       <fieldset>
+        <legend>Eventos e calendário</legend>
+        <div class="grupo">
+          <label for="eventoPremiumSemana">Premium do evento semanal<input id="eventoPremiumSemana" type="number" min="0" step="1"><small>entregues no fim de cada semana</small></label>
+          <label for="eventoGemasSemana">Gemas do evento semanal<input id="eventoGemasSemana" type="number" min="0" step="50"></label>
+          <label for="calendario">Calendário de login (30 dias)<select id="calendario"><option value="1">Ligado</option><option value="0">Desligado</option></select><small>premium nos dias 5, 10, 15, 20 e 25; gemas nos outros</small></label>
+          <label for="cal5">Prêmio do dia 30<select id="cal5"><option value="aleatorio">Herói 5★ aleatório</option><option value="escolha">Herói 5★ à escolha</option><option value="0">Sem herói</option></select></label>
+        </div>
+      </fieldset>
+      <fieldset>
         <legend>Invocação premium</legend>
         <div class="grupo">
           <label for="custoPremium">Custo em gemas<input id="custoPremium" type="number" min="1" step="10"></label>
@@ -126,11 +135,12 @@ button { font: inherit; font-weight: 600; border-radius: 8px; padding: 10px 16px
 (function () {
   const D = TavernaSim.DEFAULTS;
   const $ = (id) => document.getElementById(id);
-  const campos = ['gemasDia', 'pergComumDia', 'premiumGratisDia', 'pergPremiumDia', 'custoPremium', 'pity', 'dias'];
+  const campos = ['gemasDia', 'pergComumDia', 'premiumGratisDia', 'pergPremiumDia', 'eventoPremiumSemana', 'eventoGemasSemana', 'custoPremium', 'pity', 'dias'];
   const PADRAO = { p5: 5, max3: 4, max4: 5 };
   function preenche() {
     campos.forEach((c) => ($(c).value = D[c]));
     $('p5').value = PADRAO.p5; $('max3').value = PADRAO.max3; $('max4').value = PADRAO.max4;
+    $('calendario').value = D.calendario ? '1' : '0'; $('cal5').value = D.calendario5Estrelas || '0';
   }
   function le() {
     const cfg = {};
@@ -146,6 +156,8 @@ button { font: inherit; font-weight: 600; border-radius: 8px; padding: 10px 16px
     const m3 = +$('max3').value, m4 = +$('max4').value;
     cfg.maxEstrela = { 1: m3, 2: m3, 3: m3, 4: m4, 5: 6 };
     cfg.pity = Math.max(1, Math.round(cfg.pity));
+    cfg.calendario = $('calendario').value === '1';
+    cfg.calendario5Estrelas = $('cal5').value === '0' ? false : $('cal5').value;
     return cfg;
   }
   const fmt = (x, d = 1) => x == null ? '–' : (+x).toLocaleString('pt-BR', { maximumFractionDigits: d, minimumFractionDigits: 0 });
