@@ -66,3 +66,12 @@ Feito em 02/11: os 6 heróis têm 4 quadros cada. Corpo a corpo segue preparaç�
 | Monstros | Aura vermelha de fúria |
 
 Sombra: silhueta borrada da própria imagem, achatada e projetada para trás/direita (luz do alto à esquerda), mais uma sombra de contato pequena nos pés.
+
+## Ultimates com arte do GPT (02/11)
+Formato aprovado no teste do Morgrath:
+- **Folha de 4 quadros da habilidade** (anexando a imagem original), fundo branco. Arquivos `<heroi>-u1..u4.webp`, carregados em `META_ULT`.
+- **Imagem do efeito com fundo preto puro**: o preto vira transparente mantendo o brilho das bordas (`fx-<nome>.webp`). Efeitos de chão vão na camada do chão, atrás dos personagens.
+- Código cuida de tempo, salto/deslocamento, tremor, anéis e partículas.
+
+Morgrath (Golpe Brutal): concentra (0–22%), salta em arco até o alvo (22–50%), crava a espada (50%, impacto), pós-impacto (70–84%), volta. Duração 1,55 s.
+Próximos: Fen, Ondina, Brutus, Vex, Irmã Rosa no mesmo formato.
