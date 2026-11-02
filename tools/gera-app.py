@@ -16,7 +16,10 @@ for padrao in (r'<link rel="preconnect"[^>]*>\n?', r'<link rel="stylesheet"[^>]*
         cabeca_extra.append(m.group(0).strip()); corpo = corpo.replace(m.group(0), '', 1)
 # versão do cache = hash dos arquivos do jogo
 arquivos = ['app.html', 'logic.js', 'manifest.webmanifest'] + sorted(str(p.relative_to(jogo)) for p in (jogo / 'assets').rglob('*') if p.is_file() and p.suffix in ('.webp', '.woff2', '.mp3'))
-h = hashlib.sha1(((jogo / 'index.html').read_text(encoding='utf-8') + (jogo / 'logic.js').read_text(encoding='utf-8') + pathlib.Path(__file__).read_text(encoding='utf-8')).encode()).hexdigest()[:10]
+_h = hashlib.sha1(((jogo / 'index.html').read_text(encoding='utf-8') + (jogo / 'logic.js').read_text(encoding='utf-8') + pathlib.Path(__file__).read_text(encoding='utf-8')).encode())
+for _p in sorted((jogo / 'assets').rglob('*')):  # trocar uma imagem ou um som também gera versão nova
+    if _p.is_file(): _h.update(_p.read_bytes())
+h = _h.hexdigest()[:10]
 html = f'''<!doctype html>
 <html lang="pt-BR">
 <head>
