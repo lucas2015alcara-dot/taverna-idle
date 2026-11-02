@@ -71,6 +71,41 @@ th { color: var(--suave); font-weight: 500; }
 .labCtrl select { font: inherit; background: var(--painel2); color: var(--texto); border: 1px solid var(--linha); border-radius: 8px; padding: 4px 6px; }
 .gire { margin: 0; color: var(--suave); font-size: 13px; }
 @media (orientation: landscape) { .gire { display: none; } }
+main.cheia { padding: 0; gap: 0; }
+.hub { position: relative; width: 100%; overflow: hidden; background: #2a1d33; touch-action: manipulation; }
+.hub img { position: absolute; max-width: none; user-select: none; -webkit-user-drag: none; }
+.ponto { position: absolute; background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: 16px; }
+.ponto:focus-visible { outline: 2px solid var(--ouro); outline-offset: -2px; }
+.ponto:active { background: rgba(250, 199, 117, .12); }
+.etiqueta { position: absolute; transform: translate(-50%, -50%); pointer-events: none; white-space: nowrap;
+  font: 700 15px var(--display); color: #FFF3D6; padding: 3px 12px; border-radius: 999px; background: rgba(28, 18, 10, .78); border: 1.5px solid #E0B54A;
+  text-shadow: 0 1px 0 #000; box-shadow: 0 3px 10px rgba(0,0,0,.4); }
+.etiqueta.breve { border-color: #6B655B; color: #CFC6B4; font-size: 13px; }
+.etiqueta small { font: 500 10px var(--corpo); color: #A99C84; margin-left: 4px; }
+.selo { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 0;
+  padding: 3px 10px 4px; border-radius: 10px; border: 1.5px solid #E0B54A; background: rgba(28, 18, 10, .85); color: #FFF3D6; cursor: pointer; font: inherit; }
+.selo span { font-size: 10px; color: #CFC6B4; }
+.selo b { font-size: 13px; color: #FAC775; font-variant-numeric: tabular-nums; }
+.selo.cheio { border-color: #7FCB8F; animation: pisca 1.2s ease-in-out infinite; }
+.selo.cheio b::after { content: ' · cheio'; color: #7FCB8F; }
+.brilho { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; mix-blend-mode: screen; }
+.brilho.portal { background: radial-gradient(circle, rgba(190, 120, 255, .55) 0%, rgba(150, 80, 255, .2) 45%, transparent 70%); animation: pulsa 2.6s ease-in-out infinite; }
+.brilho.bau { background: radial-gradient(circle, rgba(255, 215, 120, .6) 0%, rgba(255, 190, 80, .15) 50%, transparent 70%); animation: pulsa 1.8s ease-in-out infinite; opacity: .5; }
+.brilho.bau.forte { opacity: 1; }
+@keyframes pulsa { 0%, 100% { transform: translate(-50%, -50%) scale(.85); opacity: .55; } 50% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; } }
+@keyframes pisca { 0%, 100% { box-shadow: 0 0 0 0 rgba(127, 203, 143, .0); } 50% { box-shadow: 0 0 14px 2px rgba(127, 203, 143, .7); } }
+.engrenagem { position: absolute; right: max(10px, env(safe-area-inset-right, 0px)); bottom: 10px; width: 40px; height: 40px; border-radius: 50%;
+  border: 1.5px solid #6B655B; background: rgba(28, 18, 10, .8); color: #CFC6B4; font-size: 20px; cursor: pointer; }
+.hubAviso { position: absolute; left: 50%; top: 10px; transform: translate(-50%, -8px); margin: 0; padding: 6px 14px; border-radius: 999px;
+  background: rgba(28, 18, 10, .9); color: #EE8A7E; font-size: 13px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; white-space: nowrap; }
+.hubAviso.ok { color: #7FCB8F; }
+.hubAviso.mostra { opacity: 1; transform: translate(-50%, 0); }
+[hidden] { display: none !important; }
+.modal { position: fixed; inset: 0; z-index: 20; background: rgba(8, 6, 4, .6); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modalCaixa { position: relative; width: min(520px, 100%); max-height: 100%; overflow: auto; background: var(--painel); border: 1px solid var(--linha); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.modalCaixa > :first-child { padding-right: 44px; }
+.modalCaixa .fechar { position: absolute; right: 10px; top: 10px; padding: 4px 10px; }
+@media (prefers-reduced-motion: reduce) { .brilho, .selo.cheio { animation: none; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 
@@ -175,59 +210,102 @@ th { color: var(--suave); font-weight: 500; }
   }
 
   // ---------- Taverna ----------
+  // ---------- Taverna (tela principal com áreas clicáveis) ----------
+  const HUB = new Image(); HUB.src = 'assets/taverna-hub.webp';
+  // áreas em frações da ilustração (x, y, largura, altura) + onde fica a etiqueta
+  const PONTOS = [
+    { id: 'invocar', nome: 'Invocar', area: [0.05, 0.12, 0.17, 0.33], et: [0.135, 0.47] },
+    { id: 'taverna', nome: 'Taverna', area: [0.25, 0.08, 0.40, 0.62], et: [0.51, 0.74] },
+    { id: 'campanha', nome: 'Campanha', area: [0.68, 0.24, 0.29, 0.32], et: [0.76, 0.56] },
+    { id: 'herois', nome: 'Heróis', area: [0.00, 0.48, 0.30, 0.50], et: [0.15, 0.95] },
+    { id: 'torre', nome: 'Torre da Fenda', area: [0.87, 0.00, 0.13, 0.26], et: [0.92, 0.27], breve: true },
+    { id: 'loja', nome: 'Loja', area: [0.69, 0.53, 0.23, 0.38], et: [0.79, 0.93], breve: true },
+  ];
   function telaTaverna() {
     const p = TL.afkPendente(E);
-    const h = Math.floor(p.min / 60), m = Math.floor(p.min % 60);
-    const tx = TL.taxaAfk(E);
     $('#tela').innerHTML = `
-      <canvas id="cTav" aria-label="A taverna com sua equipe"></canvas>
-      <div class="cartao">
-        <div class="linha entre"><h2>Ganhos enquanto você estava fora</h2><span class="suave peq">${h}h ${String(m).padStart(2, '0')}min / 12h</span></div>
-        <div class="barra"><div style="width:${(100 * p.min / TL.AFK_MAX_MIN).toFixed(1)}%"></div></div>
-        <div class="grade2">
-          <div class="stat"><span class="suave peq">Ouro</span><b>${fmt(p.ouro)}</b></div>
-          <div class="stat"><span class="suave peq">Experiência</span><b>${fmt(p.xp)}</b></div>
-        </div>
-        <p class="suave peq" style="margin:0">Rendimento atual: ${fmt(tx.ouro * 60)} ouro e ${fmt(tx.xp * 60)} xp por hora. Aumenta conforme você avança na campanha. ${p.cheio ? '<b class="ok">Baú cheio: colete para não perder ganhos.</b>' : ''}</p>
-        <button class="b prim" id="bColeta">Coletar</button>
+      <div class="hub" id="hub">
+        <img id="hubImg" src="assets/taverna-hub.webp" alt="O vilarejo da Taverna do Fim do Mundo">
+        <div class="brilho portal" id="gPortal"></div>
+        <div class="brilho bau" id="gBau"></div>
+        ${PONTOS.map((pt) => `<button class="ponto" data-id="${pt.id}" aria-label="${pt.nome}"></button>
+          <span class="etiqueta${pt.breve ? ' breve' : ''}" data-et="${pt.id}">${pt.nome}${pt.breve ? ' <small>em breve</small>' : ''}</span>`).join('')}
+        <button class="selo" id="afkSelo" data-et="selo"><span>Ganhos AFK</span><b id="afkOuro">${fmt(p.ouro)}</b></button>
+        <button class="engrenagem" id="bFerr" aria-label="Ferramentas do protótipo">⚙</button>
+        <p class="hubAviso" id="avTav" role="status"></p>
       </div>
-      <div class="cartao">
-        <h3>Ferramentas do protótipo</h3>
-        <div class="linha">
-          <button class="b" id="bTempo">Avançar 2h</button>
-          <button class="b" id="bGemas">+2.000 gemas</button>
-          <button class="b" id="bReset">Recomeçar</button>
-          <button class="b" id="bLab">Teste de animação</button>
-          <button class="b" id="bMorg">Pôr Morgrath na equipe</button>
-        </div>
-        <p class="aviso" id="avTav"></p>
-      </div>`;
-    const W = 360, H = 230, c = cena($('#cTav'), W, H);
-    const eq = E.equipe.map((u) => TL.heroi(E, u)).filter(Boolean);
-    let confirmaReset = false;
-    function desenha(t) {
-      rr(c, 0, 0, W, H, 0, '#3a2412');
-      for (let i = 0; i < 6; i++) rr(c, 0, i * 26, W, 2, 0, '#2a190b');
-      rr(c, 0, 150, W, 80, 0, '#5a3613');
-      for (let i = 0; i < 9; i++) rr(c, i * 42, 150, 2, 80, 0, '#3a2412');
-      rr(c, 18, 40, 64, 52, 4, '#1b1840'); rr(c, 49, 40, 3, 52, 0, '#2a190b'); rr(c, 18, 64, 64, 3, 0, '#2a190b');
-      c.strokeStyle = '#AFA9EC'; c.lineWidth = 2; c.beginPath(); c.moveTo(58, 44); c.lineTo(64, 54); c.lineTo(60, 62); c.stroke();
-      rr(c, 120, 14, 120, 34, 6, '#2a190b'); c.fillStyle = '#FAC775'; c.font = '600 12px "Alegreya SC", serif'; c.textAlign = 'center'; c.fillText('A Taverna do Fim do Mundo', 180, 36);
-      const f = Math.sin(t * 8) * 3; rr(c, 280, 70, 60, 50, 4, '#444441'); bola(c, 310, 100 - f / 2, 10 + f / 3, '#EF9F27'); bola(c, 310, 104, 6, '#FAC775');
-      eq.forEach((h, i) => {
-        const d = TL.DEFS[h.def], im = imgDef(h.def), x = 40 + i * 56, y = 212;
-        if (im && pronta(im)) {
-          const alt = (d.recruta ? 62 : 74) * (1 + Math.sin(t * 2.4 + i) * 0.012), w = (alt * im.naturalWidth) / im.naturalHeight;
-          c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(x, y, 20, 5, 0, 0, 7); c.fill();
-          c.drawImage(im, x - w / 2, y - alt, w, alt);
-        } else desenhaHeroi(c, x, 182, 0.72, d, t, false);
+      <div class="modal" id="modal" hidden><div class="modalCaixa" id="modalCaixa"></div></div>`;
+    $('#tela').classList.add('cheia');
+    const hub = $('#hub'), img = $('#hubImg');
+    function posiciona() {
+      const top = $('#topo').getBoundingClientRect().bottom, nav = document.querySelector('nav').getBoundingClientRect().height;
+      const H = Math.max(200, innerHeight - top - nav), W = hub.clientWidth;
+      hub.style.height = H + 'px';
+      const iw = img.naturalWidth || 1700, ih = img.naturalHeight || 730;
+      const k = Math.max(W / iw, H / ih), dw = iw * k, dh = ih * k, ox = (W - dw) / 2, oy = (H - dh) * 0.35;
+      img.style.width = dw + 'px'; img.style.height = dh + 'px'; img.style.left = ox + 'px'; img.style.top = oy + 'px';
+      const X = (f) => ox + f * dw, Y = (f) => oy + f * dh;
+      PONTOS.forEach((pt) => {
+        const b = hub.querySelector(`[data-id="${pt.id}"]`), e = hub.querySelector(`[data-et="${pt.id}"]`);
+        Object.assign(b.style, { left: X(pt.area[0]) + 'px', top: Y(pt.area[1]) + 'px', width: pt.area[2] * dw + 'px', height: pt.area[3] * dh + 'px' });
+        Object.assign(e.style, { left: Math.min(W - 60, Math.max(60, X(pt.et[0]))) + 'px', top: Math.min(H - 18, Math.max(18, Y(pt.et[1]))) + 'px' });
       });
+      const s = $('#afkSelo'); Object.assign(s.style, { left: X(0.51) + 'px', top: Math.max(30, Y(0.53)) + 'px' });
+      Object.assign($('#gPortal').style, { left: X(0.135) + 'px', top: Y(0.27) + 'px', width: 0.11 * dw + 'px', height: 0.11 * dw + 'px' });
+      Object.assign($('#gBau').style, { left: X(0.512) + 'px', top: Y(0.62) + 'px', width: 0.07 * dw + 'px', height: 0.07 * dw + 'px' });
     }
-    pararAnim(); const t0 = performance.now();
-    (function loop(n) { desenha((n - t0) / 1000); anim = requestAnimationFrame(loop); })(t0);
-    $('#bColeta').onclick = () => { const g = TL.coletaAfk(E); salva(); render(); aviso('#avTav', `Coletado: ${fmt(g.ouro)} ouro e ${fmt(g.xp)} xp.`, true); };
-    $('#bTempo').onclick = () => { E.ultimoAfk -= 2 * 3600e3; salva(); render(); };
-    $('#bLab').onclick = () => abreLaboratorio();
+    if (img.complete) posiciona(); else img.addEventListener('load', posiciona, { once: true });
+    posiciona(); addEventListener('resize', posiciona); telaSai = () => removeEventListener('resize', posiciona);
+    atualizaSelo();
+
+    const vai = (t) => { telaAtual = t; heroiAberto = null; ultimos = []; render(); };
+    hub.querySelectorAll('.ponto').forEach((b) => (b.onclick = () => {
+      const pt = PONTOS.find((x) => x.id === b.dataset.id);
+      if (pt.breve) return aviso('#avTav', pt.nome + ': em breve.', false);
+      if (pt.id === 'taverna') return abreAfk();
+      vai(pt.id);
+    }));
+    $('#afkSelo').onclick = abreAfk;
+    $('#bFerr').onclick = abreFerramentas;
+    $('#modal').onclick = (e) => { if (e.target.id === 'modal') fechaModal(); };
+  }
+  let telaSai = null;
+  function atualizaSelo() {
+    const s = $('#afkSelo'); if (!s) return;
+    const p = TL.afkPendente(E);
+    $('#afkOuro').textContent = fmt(p.ouro) + ' ouro';
+    s.classList.toggle('cheio', p.cheio);
+    $('#gBau').classList.toggle('forte', p.min > 60);
+  }
+  function abreModal(html) { $('#modalCaixa').innerHTML = html + '<button class="b fechar" id="bFechar" aria-label="Fechar">✕</button>'; $('#modal').hidden = false; $('#bFechar').onclick = fechaModal; }
+  function fechaModal() { const m = $('#modal'); if (m) m.hidden = true; }
+  function abreAfk() {
+    const p = TL.afkPendente(E), tx = TL.taxaAfk(E);
+    const h = Math.floor(p.min / 60), m = Math.floor(p.min % 60);
+    abreModal(`
+      <div class="linha entre"><h2>Baú da taverna</h2><span class="suave peq">${h}h ${String(m).padStart(2, '0')}min / 12h</span></div>
+      <div class="barra"><div style="width:${(100 * p.min / TL.AFK_MAX_MIN).toFixed(1)}%"></div></div>
+      <div class="grade2">
+        <div class="stat"><span class="suave peq">Ouro</span><b>${fmt(p.ouro)}</b></div>
+        <div class="stat"><span class="suave peq">Experiência</span><b>${fmt(p.xp)}</b></div>
+      </div>
+      <p class="suave peq" style="margin:0">Rendimento: ${fmt(tx.ouro * 60)} ouro e ${fmt(tx.xp * 60)} xp por hora. Aumenta conforme você avança na campanha.${p.cheio ? ' <b class="ok">Baú cheio: colete para não perder ganhos.</b>' : ''}</p>
+      <button class="b prim" id="bColeta">Coletar</button>`);
+    $('#bColeta').onclick = () => { const g = TL.coletaAfk(E); salva(); topo(); fechaModal(); atualizaSelo(); aviso('#avTav', `Coletado: ${fmt(g.ouro)} ouro e ${fmt(g.xp)} xp.`, true); };
+  }
+  function abreFerramentas() {
+    let confirmaReset = false;
+    abreModal(`<h2>Ferramentas do protótipo</h2>
+      <div class="linha">
+        <button class="b" id="bTempo">Avançar 2h</button>
+        <button class="b" id="bGemas">+2.000 gemas</button>
+        <button class="b" id="bLab">Teste de animação</button>
+        <button class="b" id="bMorg">Pôr Morgrath na equipe</button>
+        <button class="b" id="bReset">Recomeçar</button>
+      </div>`);
+    $('#bTempo').onclick = () => { E.ultimoAfk -= 2 * 3600e3; salva(); atualizaSelo(); aviso('#avTav', 'Avançou 2 horas.', true); };
+    $('#bGemas').onclick = () => { E.gemas += 2000; salva(); topo(); aviso('#avTav', '+2.000 gemas.', true); };
+    $('#bLab').onclick = () => { fechaModal(); abreLaboratorio(); };
     $('#bMorg').onclick = () => {
       let m = E.herois.find((h) => h.def === 'morgrath');
       if (!m) m = TL.criaHeroi(E, 'morgrath', 5);
@@ -238,15 +316,14 @@ th { color: var(--suave); font-weight: 500; }
         }
         E.equipe.push(m.uid);
       }
-      salva(); render(); aviso('#avTav', 'Morgrath está na sua equipe. Vá em Campanha e lute.', true);
+      salva(); fechaModal(); aviso('#avTav', 'Morgrath está na sua equipe. Vá em Campanha e lute.', true);
     };
-    $('#bGemas').onclick = () => { E.gemas += 2000; salva(); render(); };
     $('#bReset').onclick = () => {
       if (!confirmaReset) { confirmaReset = true; $('#bReset').textContent = 'Toque de novo para apagar tudo'; return; }
-      E = TL.novoEstado(); salva(); render();
+      E = TL.novoEstado(); salva(); fechaModal(); render();
     };
   }
-  function aviso(sel, txt, bom) { const a = $(sel); if (a) { a.textContent = txt; a.className = 'aviso' + (bom ? ' ok' : ''); } }
+  function aviso(sel, txt, bom) { const a = $(sel); if (!a) return; a.textContent = txt; if (a.classList.contains('hubAviso')) { a.className = 'hubAviso mostra' + (bom ? ' ok' : ''); clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('mostra'), 2600); } else a.className = 'aviso' + (bom ? ' ok' : ''); }
 
   // ---------- Campanha ----------
   function chipFac(fac) { const f = TL.FACCOES[fac]; return `<span class="chip" style="color:${f.claro}">${f.nome}</span>`; }
@@ -958,10 +1035,12 @@ th { color: var(--suave); font-weight: 500; }
     topo();
     document.querySelectorAll('nav button').forEach((b) => b.setAttribute('aria-current', b.dataset.tela === telaAtual ? 'page' : 'false'));
     pararAnim();
+    if (telaSai) { telaSai(); telaSai = null; }
+    $('#tela').classList.remove('cheia');
     ({ taverna: telaTaverna, campanha: telaCampanha, herois: telaHerois, invocar: telaInvocar })[telaAtual]();
   }
   document.querySelectorAll('nav button').forEach((b) => (b.onclick = () => { telaAtual = b.dataset.tela; heroiAberto = null; ultimos = []; window.scrollTo(0, 0); render(); }));
-  setInterval(() => { if (telaAtual === 'taverna' && !document.hidden) { const p = TL.afkPendente(E); const el = document.querySelector('.barra > div'); if (el) el.style.width = (100 * p.min / TL.AFK_MAX_MIN).toFixed(1) + '%'; } }, 5000);
+  setInterval(() => { if (telaAtual === 'taverna' && !document.hidden) atualizaSelo(); }, 5000);
   render();
 })();
 </script>
