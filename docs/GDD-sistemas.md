@@ -187,6 +187,27 @@ Ganhos idle pela fase mais alta vencida, acumulando até 12 horas. Coleta rápid
 - Crítico como atributo de cada herói (hoje: 15% de chance, +50% de dano para todos).
 - Animação de ultimate para cada herói e fúria para cada monstro.
 
+## Servidores e PvP (plano para depois do lançamento)
+
+Servidor = mundo lógico, não máquina separada: todos os jogadores no mesmo banco (Supabase), cada um com uma etiqueta de mundo. Abre-se um mundo novo a cada X dias ou X jogadores; arena, ranking e eventos competitivos só cruzam jogadores do mesmo mundo. Mundos vazios podem ser fundidos depois.
+
+- Supabase grátis comporta o início: 50 mil usuários ativos/mês, 500 MB de banco, 500 mil execuções de funções. Pausa após 1 semana sem uso.
+- Pro: a partir de US$ 25/mês. Fora do orçamento; só se o jogo crescer.
+- Antitrapaça: no PvP, a luta é calculada no servidor (função do Supabase) com o mesmo `logic.js`.
+
+## Monetização (rascunho, fase 5)
+
+- Sem propaganda forçada. Só anúncio opcional premiado (assistir para ganhar gemas), com limite diário.
+- Pacote inicial ~US$ 1 (uma vez), passe mensal, pacotes de gemas.
+- Regra: tudo que se compra também se consegue jogando, mais devagar.
+- Google Play: US$ 25 uma vez, sem mensalidade; taxa de 15% sobre compras até US$ 1M/ano (exige inscrição). Compras só via Google Play Billing.
+- **Alerta legal (Brasil):** ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026) restringe caixas de recompensa em jogos acessíveis a menores e exige verificação de idade. A invocação paga se enquadra. Decidir antes da fase 5: jogo 18+ com verificação de idade, ou invocação aleatória só com moeda ganha jogando e venda de itens sem sorteio. Confirmar com fonte jurídica.
+
+## Divulgação (plano)
+
+Começar grátis: vídeos de gameplay narrados (ElevenLabs) no TikTok/Shorts, Discord para os primeiros jogadores, grupos de jogos idle. Anúncio pago só depois de medir retenção, com aprovação do Lucas.
+Expectativa realista: 80% dos apps/jogos com downloads ficam abaixo de 10 mil/mês (Appfigures, 2023); em RPGs ~3% dos jogadores pagam por dia nos jogos que vão bem. Objetivo: jogo terminado e jogado; lucro não é meta.
+
 ## Decisões
 
 ### Decidido em 02/11
