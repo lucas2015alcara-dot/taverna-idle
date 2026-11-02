@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Nova ilustração da taverna do GPT (mais respiro em cima e embaixo): preenche a tela inteira sem laterais e sem cortar torre/chaminé; áreas clicáveis e etiquetas recalibradas | Tela de invocação com animação do portal |
 | 2026-11-02 | Novo fluxo de visual combinado: Claude monta a tela → Lucas tira print → GPT faz o mockup e as peças → Claude aplica. Peças do GPT aplicadas: barra de cima com losangos, placas dos recursos, barra de baixo, aba ativa brilhante, separadores, etiquetas do mapa e engrenagem (agora na barra de cima). Taverna mostra a ilustração quase inteira, com laterais desfocadas | Lucas pedir ao GPT a ilustração da taverna mais larga (21:9); depois tela de invocação |
 | 2026-11-02 | Telas de heróis no kit visual: grade de cartas (arte, borda pela raridade, brasão, estrelas-ícone, nível, selo Equipe) com filtro por facção; ficha com arte grande animada, setas para o herói anterior/próximo, atributos, custo em ouro/XP, +10 níveis, ultimate e evolução mostrando as cartas que serão consumidas e os atributos depois | Tela de invocação com animação do portal e revelação das cartas |
 | 2026-11-02 | Kit visual: 16 ícones do GPT (recursos, estrelas, brasões, poder, engrenagem) em game/assets/ui; fontes Lilita One + Nunito embutidas (offline); painéis e botões de madeira com moldura dourada; barra de recursos e navegação com ícones; fontes novas também na batalha | Telas: lista de heróis, ficha do herói, evolução, invocação com animação; som em paralelo |

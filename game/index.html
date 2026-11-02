@@ -97,7 +97,6 @@ th { color: var(--suave); font-weight: 500; }
 main.cheia { padding: 0; gap: 0; }
 .hub { position: relative; width: 100%; overflow: hidden; background: #2a1d33; touch-action: manipulation; }
 .hub img { position: absolute; max-width: none; user-select: none; -webkit-user-drag: none; }
-#hubImg { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%); }
 .hub img.hubFundo { inset: -30px; width: calc(100% + 60px); height: calc(100% + 60px); object-fit: cover; filter: blur(14px) brightness(.55) saturate(1.2); }
 .ponto { position: absolute; background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: 16px; }
 .ponto:focus-visible { outline: 2px solid var(--ouro); outline-offset: -2px; }
@@ -307,12 +306,12 @@ main.cheia { padding: 0; gap: 0; }
   const HUB = new Image(); HUB.src = 'assets/taverna-hub.webp';
   // áreas em frações da ilustração (x, y, largura, altura) + onde fica a etiqueta
   const PONTOS = [
-    { id: 'invocar', nome: 'Invocar', area: [0.05, 0.12, 0.17, 0.33], et: [0.135, 0.47] },
-    { id: 'taverna', nome: 'Taverna', area: [0.25, 0.08, 0.40, 0.62], et: [0.51, 0.74] },
-    { id: 'campanha', nome: 'Campanha', area: [0.68, 0.24, 0.29, 0.32], et: [0.76, 0.56] },
-    { id: 'herois', nome: 'Heróis', area: [0.00, 0.48, 0.30, 0.50], et: [0.15, 0.95] },
-    { id: 'torre', nome: 'Torre da Fenda', area: [0.87, 0.00, 0.13, 0.26], et: [0.92, 0.27], breve: true },
-    { id: 'loja', nome: 'Loja', area: [0.69, 0.53, 0.23, 0.38], et: [0.79, 0.93], breve: true },
+    { id: 'invocar', nome: 'Invocar', area: [0.10, 0.22, 0.15, 0.27], et: [0.178, 0.52] },
+    { id: 'taverna', nome: 'Taverna', area: [0.27, 0.18, 0.35, 0.50], et: [0.47, 0.72] },
+    { id: 'campanha', nome: 'Campanha', area: [0.64, 0.30, 0.23, 0.26], et: [0.705, 0.53] },
+    { id: 'herois', nome: 'Heróis', area: [0.03, 0.50, 0.31, 0.40], et: [0.17, 0.84] },
+    { id: 'torre', nome: 'Torre da Fenda', area: [0.80, 0.08, 0.13, 0.29], et: [0.885, 0.36], breve: true },
+    { id: 'loja', nome: 'Loja', area: [0.62, 0.56, 0.22, 0.30], et: [0.74, 0.85], breve: true },
   ];
   function telaTaverna() {
     const p = TL.afkPendente(E);
@@ -335,7 +334,7 @@ main.cheia { padding: 0; gap: 0; }
       const H = Math.max(200, innerHeight - top - nav), W = hub.clientWidth;
       hub.style.height = H + 'px';
       const iw = img.naturalWidth || 1700, ih = img.naturalHeight || 730;
-      const k = Math.max(H / ih, (W / iw) * 0.93), dw = iw * k, dh = ih * k, ox = (W - dw) / 2, oy = (H - dh) * 0.3;
+      const k = Math.max(W / iw, H / ih), dw = iw * k, dh = ih * k, ox = (W - dw) / 2, oy = (H - dh) * 0.4;
       img.style.width = dw + 'px'; img.style.height = dh + 'px'; img.style.left = ox + 'px'; img.style.top = oy + 'px';
       const X = (f) => ox + f * dw, Y = (f) => oy + f * dh;
       PONTOS.forEach((pt) => {
@@ -343,9 +342,9 @@ main.cheia { padding: 0; gap: 0; }
         Object.assign(b.style, { left: X(pt.area[0]) + 'px', top: Y(pt.area[1]) + 'px', width: pt.area[2] * dw + 'px', height: pt.area[3] * dh + 'px' });
         Object.assign(e.style, { left: Math.min(W - 60, Math.max(60, X(pt.et[0]))) + 'px', top: Math.min(H - 18, Math.max(18, Y(pt.et[1]))) + 'px' });
       });
-      const s = $('#afkSelo'); Object.assign(s.style, { left: X(0.51) + 'px', top: Math.max(30, Y(0.53)) + 'px' });
-      Object.assign($('#gPortal').style, { left: X(0.135) + 'px', top: Y(0.27) + 'px', width: 0.11 * dw + 'px', height: 0.11 * dw + 'px' });
-      Object.assign($('#gBau').style, { left: X(0.512) + 'px', top: Y(0.62) + 'px', width: 0.07 * dw + 'px', height: 0.07 * dw + 'px' });
+      const s = $('#afkSelo'); Object.assign(s.style, { left: X(0.504) + 'px', top: Math.max(30, Y(0.53)) + 'px' });
+      Object.assign($('#gPortal').style, { left: X(0.178) + 'px', top: Y(0.33) + 'px', width: 0.10 * dw + 'px', height: 0.11 * dw + 'px' });
+      Object.assign($('#gBau').style, { left: X(0.504) + 'px', top: Y(0.615) + 'px', width: 0.06 * dw + 'px', height: 0.07 * dw + 'px' });
     }
     if (img.complete) posiciona(); else img.addEventListener('load', posiciona, { once: true });
     posiciona(); addEventListener('resize', posiciona); telaSai = () => removeEventListener('resize', posiciona);
