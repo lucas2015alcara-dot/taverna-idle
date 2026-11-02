@@ -75,3 +75,11 @@ Formato aprovado no teste do Morgrath:
 
 Morgrath (Golpe Brutal): concentra (0–22%), salta em arco até o alvo (22–50%), crava a espada (50%, impacto), pós-impacto (70–84%), volta. Duração 1,55 s.
 Próximos: Fen, Ondina, Brutus, Vex, Irmã Rosa no mesmo formato.
+
+## Prompts das ultimates (enviados em 02/11)
+Para cada herói: anexar a imagem original; gerar (a) folha de 4 quadros, fundo branco; (b) efeito com fundo preto puro.
+- **Fen (Saraivada):** pega 3 flechas / mira para o alto / após disparar / abaixa o arco. Efeito: uma flecha mágica de madeira e folhas com rastro verde (reusada várias vezes na chuva).
+- **Ondina (Chuva Arcana):** cajado acima da cabeça / gira o cajado / aponta à frente / postura. Efeito: onda gigante de lado quebrando para a direita.
+- **Brutus (Muralha):** escudo erguido / bate no chão / agachado atrás do escudo / levanta. Efeito: barreira dourada vertical com runas e brasão de torre.
+- **Vex (Golpe nas Costas):** envolto em fumaça / salta com adagas para trás / golpe duplo descendente / pose final. Efeito: explosão de fumaça roxa.
+- **Irmã Rosa (Prece):** livro erguido rezando / mãos em oração / braços abertos para o alto / postura. Efeito: feixe vertical de luz dourada com pétalas.
