@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Telas de heróis no kit visual: grade de cartas (arte, borda pela raridade, brasão, estrelas-ícone, nível, selo Equipe) com filtro por facção; ficha com arte grande animada, setas para o herói anterior/próximo, atributos, custo em ouro/XP, +10 níveis, ultimate e evolução mostrando as cartas que serão consumidas e os atributos depois | Tela de invocação com animação do portal e revelação das cartas |
 | 2026-11-02 | Kit visual: 16 ícones do GPT (recursos, estrelas, brasões, poder, engrenagem) em game/assets/ui; fontes Lilita One + Nunito embutidas (offline); painéis e botões de madeira com moldura dourada; barra de recursos e navegação com ícones; fontes novas também na batalha | Telas: lista de heróis, ficha do herói, evolução, invocação com animação; som em paralelo |
 | 2026-11-02 | Tela principal da taverna com a ilustração do GPT: áreas clicáveis (portal → Invocar, taverna/baú → coletar AFK, portão → Campanha, quartel → Heróis; Torre e Loja em breve), etiquetas, selo de ganhos AFK, brilho no portal e no baú, ferramentas do protótipo na engrenagem | Som e música (prompts do ElevenLabs) |
 | 2026-11-02 | Batalha ocupa a tela inteira em qualquer proporção (16:9 a 21:9+): largura lógica da arena se adapta, cenário corta mais o céu, formação centralizada e times levemente afastados em telas largas | Tela principal da taverna (prompt do GPT) |
