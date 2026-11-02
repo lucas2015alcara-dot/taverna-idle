@@ -20,6 +20,9 @@ Mais:
 
 Custo: o GPT tem dificuldade de gerar peças que se encaixam perfeitamente. Caminho realista: pedir o herói em pose neutra (braços afastados do corpo) e recortar as peças manualmente num editor, ou contratar um artista só para o recorte.
 
+## Decisão (02/11)
+Lucas aprovou a animação por quadros do GPT: cada herói ganha uma folha de 4 quadros de ataque (e depois uma de ultimate), gerada anexando a imagem original.
+
 ## Teste quadro a quadro (feito em 02/11)
 Resultado: os 4 quadros vieram consistentes. Separados da folha pela forma de cada quadro, na mesma escala e alinhados pelos pés (`QUADROS` no index.html). Modo escolhido em `CFG_ATAQUE.modo`: 'codigo' (imagem inteira com giro) ou 'quadros'. Nos quadros, o avanço continua por código e só a pose muda.
 

@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Fase 3 preparada: versão app (game/app.html gerado por tools/gera-app.py), manifesto deitado/tela cheia, ícones, modo offline, redirecionamento na raiz. Guia em docs/PUBLICAR.md. Lucas aprovou a animação por quadros do GPT (padrão) | Lucas ligar o GitHub Pages, gerar no PWABuilder e instalar no celular |
 | 2026-11-02 | Arte dos 6 monstros e 4 recrutas (folhas do GPT separadas e recortadas) no jogo. Teste quadro a quadro do Morgrath: 4 quadros alinhados pelos pés, modo "Quadros do GPT" no Teste de animação e na batalha | Lucas comparar os dois modos de animação; definir ultimates |
 | 2026-11-02 | Combate mudado para turnos por equipe (jogador inteiro, depois inimigos), com aviso de vez na tela; ultimate automática mantida. Ritmo da campanha praticamente igual no teste | Lucas testar; monstros e recrutas do GPT |
 | 2026-11-02 | Animação de ataque corpo a corpo com sprite inteiro (preparação, avanço, golpe com giro, arco de energia, chamas, tremor, retorno), ajustável; tela Teste de animação com Morgrath. Requisitos de animação esquelética em docs/arte/animacao.md | Lucas testar e ajustar os controles; gerar monstros e recrutas no GPT |
