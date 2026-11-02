@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Quadros de ação dos 6 heróis no jogo (Fen, Ondina, Irmã Rosa, Brutus, Vex + Morgrath): tiro, feitiço e bênção sincronizados com flecha/magia/cura; seletor de herói no Teste de animação | Ultimates (efeitos por herói) e tela principal da taverna |
 | 2026-11-02 | Planos anotados no GDD: servidores como mundos lógicos no Supabase (pós-lançamento), monetização equilibrada (anúncio só opcional premiado, pacote inicial, passe), divulgação grátis primeiro. Alerta: ECA Digital restringe caixas de recompensa para menores | Decidir caminho legal da invocação paga antes da fase 5; quadros dos 5 heróis |
 | 2026-11-02 | Aviso "Nova versão disponível" no app (testado simulando uma publicação nova); service worker baixa arquivos frescos. Explicado ao Lucas: atualizações de conteúdo não exigem reinstalar | Lucas gerar os quadros dos outros 5 heróis no GPT |
 | 2026-11-02 | Repositório raiz lucas2015alcara-dot.github.io criado com assetlinks.json (verificação do app) e redirecionamento para o jogo; tela cheia no primeiro toque como paliativo | Lucas reabrir/reinstalar o app e confirmar que a barra sumiu e trava deitado |

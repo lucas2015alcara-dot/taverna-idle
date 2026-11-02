@@ -52,4 +52,4 @@ Anexar a imagem original do herói e pedir 4 quadros numa linha, mesma escala, p
 - Fen (tiro): pega flecha / encaixa / arco puxado / após soltar.
 - Ondina (feitiço): junta energia / gira / lança / recupera.
 - Irmã Rosa (bênção): reza / ergue a mão / mão no alto / recupera.
-Pendente no código: usar quadros também em ataques à distância e curas (hoje só corpo a corpo).
+Feito em 02/11: os 6 heróis têm 4 quadros cada. Corpo a corpo segue preparação/avanço/golpe/retorno; à distância e cura trocam quadros em 25%/50%/78%/95% da ação, com a flecha/magia saindo no quadro 3 e a cura em 58%. Teste de animação tem seletor de herói.

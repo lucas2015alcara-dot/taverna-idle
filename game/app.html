@@ -112,8 +112,9 @@ th { color: var(--suave); font-weight: 500; }
   ['floresta', 'fortaleza', 'abismo', 'sombra'].forEach((f) => (ARTE['rec-' + f] = 'assets/rec-' + f + '.webp'));
   Object.entries({ floresta: 'espinhoso', fortaleza: 'golem', abismo: 'lodo', sombra: 'espectro', luz: 'sentinela', trevas: 'cria' }).forEach(([f, n]) => (ARTE['mon-' + f] = 'assets/mon-' + n + '.webp'));
   const IMG = {}; Object.entries(ARTE).forEach(([k, src]) => { const im = new Image(); im.src = src; IMG[k] = im; });
-  // quadros de ataque gerados no GPT (mesma escala; pe = posição dos pés na largura)
-  const QUADROS = { morgrath: [{"w": 377, "h": 495, "pe": 0.585}, {"w": 432, "h": 496, "pe": 0.503}, {"w": 575, "h": 408, "pe": 0.356}, {"w": 448, "h": 405, "pe": 0.544}].map((m, i) => { const im = new Image(); im.src = 'assets/morgrath-q' + (i + 1) + '.webp'; return { ...m, im }; }) };
+  // quadros de ação gerados no GPT (mesma escala; pe = posição dos pés na largura)
+  const META_QUADROS = {"morgrath":[{"w":377,"h":495,"pe":0.585},{"w":432,"h":496,"pe":0.503},{"w":575,"h":408,"pe":0.356},{"w":448,"h":405,"pe":0.544}],"rosa":[{"w":279,"h":415,"pe":0.519},{"w":293,"h":418,"pe":0.496},{"w":294,"h":421,"pe":0.5},{"w":280,"h":419,"pe":0.519}],"ondina":[{"w":316,"h":458,"pe":0.561},{"w":390,"h":457,"pe":0.453},{"w":379,"h":418,"pe":0.477},{"w":364,"h":406,"pe":0.489}],"fen":[{"w":332,"h":435,"pe":0.458},{"w":345,"h":418,"pe":0.444},{"w":383,"h":436,"pe":0.417},{"w":363,"h":417,"pe":0.459}],"vex":[{"w":355,"h":418,"pe":0.494},{"w":464,"h":406,"pe":0.265},{"w":403,"h":427,"pe":0.524},{"w":462,"h":429,"pe":0.498}],"brutus":[{"w":419,"h":497,"pe":0.509},{"w":511,"h":425,"pe":0.405},{"w":452,"h":388,"pe":0.517},{"w":412,"h":418,"pe":0.468}]};
+  const QUADROS = {}; Object.entries(META_QUADROS).forEach(([n, lista]) => (QUADROS[n] = lista.map((m, i) => { const im = new Image(); im.src = 'assets/' + n + '-q' + (i + 1) + '.webp'; return { ...m, im }; })));
   // imagem de um herói pela definição (campeão ou recruta da facção)
   function imgDef(def) { const d = TL.DEFS[def]; if (!d) return null; return IMG[def] || (d.recruta ? IMG['rec-' + d.fac] : null); }
   const FUNDO = new Image(); FUNDO.src = 'assets/cenario-clareira.webp';
@@ -392,9 +393,11 @@ th { color: var(--suave); font-weight: 500; }
       const altura = u.monstro ? (u.chefe ? 125 : 92) : TL.DEFS[u.ref] && TL.DEFS[u.ref].recruta ? 88 : 108;
       // quadro de ataque do GPT, quando o modo "quadros" estiver ligado e o herói tiver quadros
       let quadro = null;
-      if (CFG_ATAQUE.modo === 'quadros' && u.acao && u.acao.melee && QUADROS[u.ref]) {
+      if (CFG_ATAQUE.modo === 'quadros' && u.acao && QUADROS[u.ref]) {
         const p = u.acao.t / u.acao.dur, q = QUADROS[u.ref];
-        const iq = p < FASES.prep ? 0 : p < FASES.avanco ? 1 : p < FASES.golpe ? 2 : p < 0.78 ? 3 : -1;
+        const iq = u.acao.melee
+          ? (p < FASES.prep ? 0 : p < FASES.avanco ? 1 : p < FASES.golpe ? 2 : p < 0.78 ? 3 : -1)
+          : (p < 0.25 ? 0 : p < 0.5 ? 1 : p < 0.78 ? 2 : p < 0.95 ? 3 : -1); // tiro, feitiço e bênção
         if (iq >= 0 && pronta(q[iq].im)) quadro = q[iq];
       }
       let topo;
@@ -464,15 +467,17 @@ th { color: var(--suave); font-weight: 500; }
       if (rapido) { ev.golpes.forEach((g) => golpeia(g, true)); ev.curas.forEach((g) => cura(g, true)); return 0; }
       const alvo = ev.golpes.length ? uni[ev.golpes[0].alvo] : null;
       const melee = !!CORPO_A_CORPO[a.funcao] && !!alvo && ev.golpes.length === 1;
-      const dur = melee ? (ev.hab ? 1.15 : 1) / CFG_ATAQUE.velocidade : ev.hab ? 1.05 : 0.72;
+      const comQuadros = CFG_ATAQUE.modo === 'quadros' && !!QUADROS[a.ref];
+      const dur = melee ? (ev.hab ? 1.15 : 1) / CFG_ATAQUE.velocidade : comQuadros ? (ev.hab ? 1.1 : 0.95) / CFG_ATAQUE.velocidade : ev.hab ? 1.05 : 0.72;
+      const disparo = !melee && comQuadros ? dur * 0.5 : 0; // flecha/magia sai no quadro 3
       a.acao = { t: 0, dur, melee, alvo };
       if (ev.hab) { a.brilho = 1; banner = { txt: a.nome + ' · ' + ev.nomeHab, l: 1.3 }; tremor = ev.golpes.length > 1 ? 0.35 : 0.18; }
-      const impacto = melee ? dur * MOMENTO_IMPACTO : 0.42;
+      const impacto = melee ? dur * MOMENTO_IMPACTO : disparo + 0.38;
       if (melee) pend.push({ em: relogio + impacto, fn: () => { const dirA = a.id[0] === 'a' ? 1 : -1; fx.golpe(alvo.x - dirA * 10, alvo.y - 55, dirA, a.fac, CFG_ATAQUE.intensidade * (ev.hab ? 1.3 : 1)); alvo.tremor = 1 + CFG_ATAQUE.intensidade; } });
-      if (!melee) ev.golpes.forEach((g, k) => proj.push({ de: a, para: uni[g.alvo], t: -k * 0.09, dur: 0.38, tipo: a.funcao === 'arqueiro' ? 'arqueiro' : 'magia', fac: a.fac }));
+      if (!melee) ev.golpes.forEach((g, k) => proj.push({ de: a, para: uni[g.alvo], t: -disparo - k * 0.09, dur: 0.38, tipo: a.funcao === 'arqueiro' ? 'arqueiro' : 'magia', fac: a.fac }));
       ev.golpes.forEach((g, k) => pend.push({ em: relogio + impacto + (melee ? 0 : k * 0.09), fn: () => golpeia(g, false) }));
-      ev.curas.forEach((g) => pend.push({ em: relogio + 0.45, fn: () => cura(g, false) }));
-      return melee ? dur * 0.85 : dur;
+      ev.curas.forEach((g) => pend.push({ em: relogio + (comQuadros ? dur * 0.58 : 0.45), fn: () => cura(g, false) }));
+      return melee ? dur * 0.85 : comQuadros ? Math.max(dur, impacto + 0.1) : dur;
     }
     const pend = [];
 
@@ -564,6 +569,7 @@ th { color: var(--suave); font-weight: 500; }
         <label for="lVel">Velocidade <input id="lVel" type="range" min="0.5" max="2" step="0.1" value="${CFG_ATAQUE.velocidade}"></label>
         <label for="lDist">Avanço <input id="lDist" type="range" min="0.3" max="1.2" step="0.05" value="${CFG_ATAQUE.distancia}"></label>
         <label for="lInt">Intensidade <input id="lInt" type="range" min="0.3" max="2" step="0.1" value="${CFG_ATAQUE.intensidade}"></label>
+        <label for="lHeroi">Herói <select id="lHeroi">${TL.CAMPEOES.map((c) => `<option value="${c.id}"${c.id === 'morgrath' ? ' selected' : ''}>${c.nome}</option>`).join('')}</select></label>
         <label for="lModo">Modo <select id="lModo"><option value="codigo">Imagem + código</option><option value="quadros">Quadros do GPT</option></select></label>
         <button class="b prim" id="bAtacar">Atacar</button><button class="b" id="bSair">Sair</button>
       </div>`;
@@ -575,13 +581,21 @@ th { color: var(--suave); font-weight: 500; }
     }
     ajusta(); addEventListener('resize', ajusta);
     const c = cena(cv, AW, AH);
-    const heroi = { id: 'a0', nome: 'Morgrath', fac: 'trevas', funcao: 'guerreiro', hpMax: 99999, ref: 'morgrath' };
     const boneco = { id: 'b0', nome: 'Boneco de treino', fac: 'floresta', funcao: 'tanque', hpMax: 99999, monstro: true };
-    const arena = criaArena([heroi], [boneco], false);
+    let arena, heroi;
+    function montaLab(id) {
+      const d = TL.DEFS[id];
+      heroi = { id: 'a0', nome: d.nome, fac: d.fac, funcao: d.funcao, hpMax: 99999, ref: id };
+      arena = criaArena([heroi], [boneco], false);
+      if (d.funcao === 'suporte') arena.uni.a0.hp = 60000; // para a cura aparecer
+    }
+    montaLab('morgrath');
+    $('#lHeroi').onchange = (e) => montaLab(e.target.value);
     [['lVel', 'velocidade'], ['lDist', 'distancia'], ['lInt', 'intensidade']].forEach(([id, k]) => ($('#' + id).oninput = (e) => (CFG_ATAQUE[k] = +e.target.value)));
     $('#lModo').value = CFG_ATAQUE.modo; $('#lModo').onchange = (e) => (CFG_ATAQUE.modo = e.target.value);
     $('#bAtacar').onclick = () => {
       const dano = Math.round(800 + Math.random() * 400 * CFG_ATAQUE.intensidade);
+      if (heroi.funcao === 'suporte') { arena.uni.a0.hp = Math.min(arena.uni.a0.hp, 60000); arena.aplica({ t: 'acao', de: 'a0', hab: true, nomeHab: 'Prece', golpes: [], curas: [{ alvo: 'a0', cura: 9000 }] }, false); return; }
       arena.aplica({ t: 'acao', de: 'a0', hab: false, golpes: [{ alvo: 'b0', dano, crit: Math.random() < 0.2, vant: false }], curas: [] }, false);
     };
     $('#bSair').onclick = () => { pararAnim(); removeEventListener('resize', ajusta); div.remove(); render(); };
