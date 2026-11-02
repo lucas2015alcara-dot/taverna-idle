@@ -424,6 +424,73 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
     const c = canvas.getContext('2d'); c.scale(dpr, dpr); return c;
   }
 
+  // ---------- Som ----------
+  // efeitos pelo Web Audio (sem atraso, vários ao mesmo tempo); música por <audio> em loop
+  const SOM = (() => {
+    let cfg = { musica: true, efeitos: true };
+    try { Object.assign(cfg, JSON.parse(localStorage.getItem('taverna-som') || '{}')); } catch (e) {}
+    const guarda = () => { try { localStorage.setItem('taverna-som', JSON.stringify(cfg)); } catch (e) {} };
+    const VOL = { botao: 0.35, 'virar-carta': 0.6, moedas: 0.7, 'portal-carga': 0.8, flecha: 0.6, 'golpe-espada': 0.7, 'golpe-pesado': 0.75, 'magia-agua': 0.6, cura: 0.6, fumaca: 0.7 };
+    let ctx = null, mestre = null; const buf = {}, carregando = {};
+    function contexto() {
+      if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ctx = new AC(); mestre = ctx.createGain(); mestre.gain.value = 0.8; mestre.connect(ctx.destination); }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    }
+    function carrega(n) {
+      if (buf[n] || carregando[n] || !ctx) return carregando[n];
+      carregando[n] = fetch('assets/som/' + n + '.mp3').then((r) => r.arrayBuffer()).then((a) => new Promise((ok, erro) => ctx.decodeAudioData(a, ok, erro)))
+        .then((b) => (buf[n] = b)).catch(() => null);
+      return carregando[n];
+    }
+    const ultimaVez = {};
+    function toca(n, vol = 1) {
+      if (!cfg.efeitos || document.hidden) return;
+      const c = contexto(); if (!c) return;
+      const agora = performance.now(); if (ultimaVez[n] && agora - ultimaVez[n] < 45) return; ultimaVez[n] = agora; // evita empilhar o mesmo som
+      const vai = (b) => { if (!b) return; const s = c.createBufferSource(), g = c.createGain(); g.gain.value = (VOL[n] || 0.85) * vol; s.buffer = b; s.connect(g); g.connect(mestre); s.start(); };
+      if (buf[n]) vai(buf[n]); else (carrega(n) || Promise.resolve()).then(vai);
+    }
+    // música
+    const faixas = {}; let atual = null, pedida = null, liberado = false;
+    function faixa(n) { if (!faixas[n]) { const a = new Audio('assets/som/musica-' + n + '.mp3'); a.loop = true; a.preload = 'auto'; a.volume = 0; faixas[n] = a; } return faixas[n]; }
+    function fade(a, alvo, ms, fim) {
+      const ini = a.volume, t0 = performance.now(), id = (a._fade = (a._fade || 0) + 1);
+      const passo = () => {
+        if (a._fade !== id) return; // outro fade assumiu
+        const k = Math.min(1, Math.max(0, (performance.now() - t0) / ms));
+        a.volume = Math.min(1, Math.max(0, ini + (alvo - ini) * k));
+        if (k < 1) requestAnimationFrame(passo); else if (fim) fim();
+      };
+      requestAnimationFrame(passo);
+    }
+    function musica(n) {
+      pedida = n;
+      if (!liberado || !cfg.musica) return;
+      if (atual === n) { const a = faixa(n); if (a.paused) a.play().catch(() => {}); return; }
+      if (atual) { const v = faixa(atual); fade(v, 0, 600, () => v.pause()); }
+      atual = n; const a = faixa(n); a.currentTime = 0; a.play().catch(() => {}); fade(a, 0.45, 900);
+    }
+    function paraMusica() { if (atual) { const v = faixa(atual); fade(v, 0, 300, () => v.pause()); atual = null; } }
+    // o celular só libera áudio depois do primeiro toque
+    const libera = () => {
+      if (liberado) return; liberado = true; contexto();
+      ['botao', 'golpe-espada', 'golpe-pesado', 'flecha', 'magia-agua', 'cura', 'ultimate', 'virar-carta'].forEach(carrega);
+      if (pedida) musica(pedida);
+    };
+    addEventListener('pointerdown', libera, { capture: true }); addEventListener('keydown', libera, { capture: true });
+    document.addEventListener('visibilitychange', () => {
+      if (!atual) return; const a = faixa(atual);
+      if (document.hidden) a.pause(); else if (cfg.musica) a.play().catch(() => {});
+    });
+    // clique em qualquer botão
+    addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && !b.disabled && !b.classList.contains('bInv') && !b.closest('.vira')) toca('botao'); }, true);
+    return {
+      toca, musica, cfg,
+      alterna(k) { cfg[k] = !cfg[k]; guarda(); if (k === 'musica') { if (cfg.musica) { const p = pedida; atual = null; musica(p); } else paraMusica(); } },
+    };
+  })();
+
   // ---------- Topo ----------
   function topo() {
     $('#topo').innerHTML = [
@@ -515,11 +582,15 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
       </div>
       <p class="suave peq" style="margin:0">Rendimento: ${fmt(tx.ouro * 60)} ouro e ${fmt(tx.xp * 60)} xp por hora. Aumenta conforme você avança na campanha.${p.cheio ? ' <b class="ok">Baú cheio: colete para não perder ganhos.</b>' : ''}</p>
       <button class="b prim" id="bColeta">Coletar</button>`);
-    $('#bColeta').onclick = () => { const g = TL.coletaAfk(E); salva(); topo(); fechaModal(); atualizaSelo(); aviso('#avTav', `Coletado: ${fmt(g.ouro)} ouro e ${fmt(g.xp)} xp.`, true); };
+    $('#bColeta').onclick = () => { const g = TL.coletaAfk(E); SOM.toca('moedas'); salva(); topo(); fechaModal(); atualizaSelo(); aviso('#avTav', `Coletado: ${fmt(g.ouro)} ouro e ${fmt(g.xp)} xp.`, true); };
   }
   function abreFerramentas() {
     let confirmaReset = false;
     abreModal(`<h2>Ferramentas do protótipo</h2>
+      <div class="linha">
+        <button class="b" id="bMus">Música: ${SOM.cfg.musica ? 'ligada' : 'desligada'}</button>
+        <button class="b" id="bEfe">Efeitos: ${SOM.cfg.efeitos ? 'ligados' : 'desligados'}</button>
+      </div>
       <div class="linha">
         <button class="b" id="bTempo">Avançar 2h</button>
         <button class="b" id="bGemas">+2.000 gemas</button>
@@ -527,6 +598,8 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
         <button class="b" id="bMorg">Pôr Morgrath na equipe</button>
         <button class="b" id="bReset">Recomeçar</button>
       </div>`);
+    $('#bMus').onclick = () => { SOM.alterna('musica'); $('#bMus').textContent = 'Música: ' + (SOM.cfg.musica ? 'ligada' : 'desligada'); };
+    $('#bEfe').onclick = () => { SOM.alterna('efeitos'); $('#bEfe').textContent = 'Efeitos: ' + (SOM.cfg.efeitos ? 'ligados' : 'desligados'); };
     $('#bTempo').onclick = () => { E.ultimoAfk -= 2 * 3600e3; salva(); atualizaSelo(); aviso('#avTav', 'Avançou 2 horas.', true); };
     $('#bGemas').onclick = () => { E.gemas += 2000; salva(); topo(); aviso('#avTav', '+2.000 gemas.', true); };
     $('#bLab').onclick = () => { fechaModal(); abreLaboratorio(); };
@@ -992,6 +1065,15 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
       const lado = (id) => Object.values(uni).filter((x) => x.id[0] === id && x.hp > 0);
       const depois = (t, fn) => pend.push({ em: relogio + t, fn });
       let semProjetil = false, tempoGolpe = null;
+      const somBase = { guerreiro: 'golpe-espada', assassino: 'golpe-espada', tanque: 'golpe-pesado', arqueiro: 'flecha', mago: 'magia-agua', suporte: 'cura' }[a.funcao];
+      const SOM_ULT = { fen: ['flecha', disparo + 0.05], ondina: ['magia-agua', disparo], brutus: ['golpe-pesado', impacto], vex: ['fumaca', 0], rosa: ['cura', dur * 0.42], morgrath: ['explosao-fogo', impacto], furia: ['golpe-pesado', impacto] };
+      if (ev.hab) {
+        SOM.toca('ultimate');
+        const [sn, st] = SOM_ULT[ult] || [somBase, melee ? impacto : disparo];
+        depois(st, () => SOM.toca(sn));
+        if (ult === 'vex') depois(impacto, () => SOM.toca('golpe-espada'));
+        if (ult === 'fen') depois(disparo + 0.35, () => SOM.toca('flecha', 0.7));
+      } else if (somBase) depois(a.funcao === 'suporte' ? (comQuadros ? dur * 0.5 : 0.35) : melee ? impacto : Math.max(0, disparo), () => SOM.toca(somBase));
       if (ult === 'fen') { // Saraivada: chuva de flechas de folha sobre os inimigos
         semProjetil = true;
         const alvosChuva = lado(a.id[0] === 'a' ? 'b' : 'a');
@@ -1074,7 +1156,7 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
   }
 
   function abreBatalha(res) {
-    pararAnim();
+    pararAnim(); SOM.musica('batalha');
     const div = document.createElement('div');
     div.className = 'arena';
     div.innerHTML = `<div class="palco"><canvas id="cArena" aria-label="Batalha"></canvas><div id="faixa"></div>
@@ -1098,10 +1180,11 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
       if (acabou) return; acabou = true;
       $('.arenaBotoes', div).hidden = true;
       const r = res.rec;
+      SOM.toca(res.venceu ? 'vitoria' : 'derrota');
       $('#faixa').innerHTML = `<div class="faixa"><h2 style="color:${res.venceu ? 'var(--ouro)' : 'var(--ruim)'}">${res.venceu ? 'Vitória' : 'Derrota'}</h2>
         <div class="peq">${res.venceu ? (r ? `+${fmt(r.ouro)} ouro · +${fmt(r.xp)} xp · +${r.gemas} gemas${r.pergC ? ' · +' + r.pergC + ' perg. comuns' : ''}${r.pergP ? ' · +1 perg. premium' : ''}` : 'Fase já vencida antes: sem recompensa.') : 'Suba o nível dos heróis, evolua ou use a vantagem de facção.'}</div>
         <button class="b prim" id="bCont">${res.venceu ? 'Continuar' : 'Voltar'}</button></div>`;
-      $('#bCont').onclick = () => { pararAnim(); removeEventListener('resize', ajusta); div.remove(); render(); };
+      $('#bCont').onclick = () => { pararAnim(); removeEventListener('resize', ajusta); div.remove(); render(); SOM.musica('taverna'); };
     }
     let ult = performance.now();
     (function loop(t) {
@@ -1282,8 +1365,8 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
     $('#bVolta').onclick = () => { heroiAberto = null; render(); };
     $('#bAnt').onclick = () => { heroiAberto = lista[(pos - 1 + lista.length) % lista.length].uid; render(); };
     $('#bProx').onclick = () => { heroiAberto = lista[(pos + 1) % lista.length].uid; render(); };
-    if ($('#bSobe')) $('#bSobe').onclick = () => { TL.subirNivel(E, h.uid); salva(); render(); };
-    if ($('#bSobe10')) $('#bSobe10').onclick = () => { for (let i = 0; i < 10; i++) if (!TL.subirNivel(E, h.uid).ok) break; salva(); render(); };
+    if ($('#bSobe')) $('#bSobe').onclick = () => { if (TL.subirNivel(E, h.uid).ok) SOM.toca('subir-nivel'); salva(); render(); };
+    if ($('#bSobe10')) $('#bSobe10').onclick = () => { let k = 0; for (let i = 0; i < 10; i++) { if (!TL.subirNivel(E, h.uid).ok) break; k++; } if (k) SOM.toca('subir-nivel'); salva(); render(); };
     $('#bEq').onclick = () => {
       if (naEq) E.equipe = E.equipe.filter((u) => u !== h.uid);
       else {
@@ -1294,7 +1377,7 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
       salva(); render();
     };
     if ($('#bEvo')) $('#bEvo').onclick = () => {
-      const r = TL.evoluir(E, h.uid); salva(); render();
+      const r = TL.evoluir(E, h.uid); if (r.ok) SOM.toca('evoluir'); salva(); render();
       if (r.ok) { aviso('#avD', d.nome + ' agora é ' + r.heroi.est + '★!', true); const p = document.querySelector('.palcoHeroi'); if (p) { p.classList.add('evoluiu'); setTimeout(() => p.classList.remove('evoluiu'), 1200); } }
     };
   }
@@ -1375,7 +1458,7 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
     const melhor = Math.max(...res.map((h) => h.est));
     const cor = melhor >= 5 ? 'ouro' : melhor === 4 ? 'roxo' : 'azul';
     const calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const portal = $('#portal'); portal.dataset.cor = cor; portal.classList.add('carga');
+    const portal = $('#portal'); portal.dataset.cor = cor; portal.classList.add('carga'); SOM.toca('portal-carga');
     document.querySelectorAll('.bInv').forEach((b) => (b.disabled = true));
     const ov = document.createElement('div');
     ov.className = 'revela'; ov.dataset.cor = cor; ov.dataset.n = res.length;
@@ -1386,7 +1469,7 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
       <div class="rAcoes"><button class="b" id="bRevTudo">Revelar tudo</button></div>`;
     const comeca = () => {
       portal.classList.remove('carga');
-      document.body.appendChild(ov);
+      document.body.appendChild(ov); SOM.toca('invocacao');
       requestAnimationFrame(() => ov.classList.add('entra'));
       const cartas = [...ov.querySelectorAll('.vira')];
       let k = 0, timer = null;
@@ -1397,7 +1480,7 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
         $('#bRevOk').onclick = fecha;
         $('#bRevDeNovo').onclick = () => { ov.remove(); render(); denovo(); };
       };
-      const vira = (c) => { if (c.classList.contains('virada')) return; c.classList.add('virada'); if (c.classList.contains('cinco')) ov.classList.add('flash'), setTimeout(() => ov.classList.remove('flash'), 600); };
+      const vira = (c) => { if (c.classList.contains('virada')) return; c.classList.add('virada'); SOM.toca('virar-carta'); if (c.classList.contains('cinco')) { SOM.toca('revelacao-5'); ov.classList.add('flash'); setTimeout(() => ov.classList.remove('flash'), 600); } };
       const proxima = () => {
         while (k < cartas.length && cartas[k].classList.contains('virada')) k++;
         if (k >= cartas.length) return fim();
@@ -1405,7 +1488,7 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
         timer = setTimeout(proxima, calmo ? 60 : c.classList.contains('cinco') ? 900 : 230);
       };
       cartas.forEach((c) => (c.onclick = () => { vira(c); if (cartas.every((x) => x.classList.contains('virada'))) { clearTimeout(timer); fim(); } }));
-      $('#bRevTudo').onclick = () => { clearTimeout(timer); cartas.forEach((c) => c.classList.add('virada')); if (cartas.some((c) => c.classList.contains('cinco'))) ov.classList.add('flash'); fim(); };
+      $('#bRevTudo').onclick = () => { clearTimeout(timer); cartas.forEach((c) => c.classList.add('virada')); SOM.toca('virar-carta'); if (cartas.some((c) => c.classList.contains('cinco'))) { ov.classList.add('flash'); SOM.toca('revelacao-5'); } fim(); };
       timer = setTimeout(proxima, calmo ? 100 : 450 + res.length * 40);
     };
     setTimeout(comeca, calmo ? 50 : 1100);
@@ -1413,6 +1496,7 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
 
   // ---------- Navegação ----------
   function render() {
+    if (!document.querySelector('.arena')) SOM.musica('taverna');
     topo();
     document.querySelectorAll('nav button').forEach((b) => b.setAttribute('aria-current', b.dataset.tela === telaAtual ? 'page' : 'false'));
     pararAnim();
