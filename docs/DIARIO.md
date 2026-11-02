@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Arte dos 6 monstros e 4 recrutas (folhas do GPT separadas e recortadas) no jogo. Teste quadro a quadro do Morgrath: 4 quadros alinhados pelos pés, modo "Quadros do GPT" no Teste de animação e na batalha | Lucas comparar os dois modos de animação; definir ultimates |
 | 2026-11-02 | Combate mudado para turnos por equipe (jogador inteiro, depois inimigos), com aviso de vez na tela; ultimate automática mantida. Ritmo da campanha praticamente igual no teste | Lucas testar; monstros e recrutas do GPT |
 | 2026-11-02 | Animação de ataque corpo a corpo com sprite inteiro (preparação, avanço, golpe com giro, arco de energia, chamas, tremor, retorno), ajustável; tela Teste de animação com Morgrath. Requisitos de animação esquelética em docs/arte/animacao.md | Lucas testar e ajustar os controles; gerar monstros e recrutas no GPT |
 | 2026-11-02 | Arte provisória do GPT: 6 heróis + cenário Clareira da Fenda (originais em docs/arte/originais, recortados em game/assets). Batalha refeita em paisagem (16:9, tela cheia) com animação por código: respiração, avanço corpo a corpo, flechas e magias, piscar ao levar dano, tremor nas habilidades, morte com queda | Lucas jogar e avaliar; depois upgrade de arte (monstros, tela principal) |

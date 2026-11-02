@@ -20,7 +20,10 @@ Mais:
 
 Custo: o GPT tem dificuldade de gerar peças que se encaixam perfeitamente. Caminho realista: pedir o herói em pose neutra (braços afastados do corpo) e recortar as peças manualmente num editor, ou contratar um artista só para o recorte.
 
-## Teste quadro a quadro (a fazer)
+## Teste quadro a quadro (feito em 02/11)
+Resultado: os 4 quadros vieram consistentes. Separados da folha pela forma de cada quadro, na mesma escala e alinhados pelos pés (`QUADROS` no index.html). Modo escolhido em `CFG_ATAQUE.modo`: 'codigo' (imagem inteira com giro) ou 'quadros'. Nos quadros, o avanço continua por código e só a pose muda.
+
+### Prompt usado
 Prompt para o ChatGPT, com a imagem do Morgrath anexada:
 
 > Usando o personagem da imagem anexada, sem mudar nada no visual dele (mesma armadura, cores, chifres, capa e espada), crie uma folha de animação (sprite sheet) de ataque com 4 quadros, lado a lado numa única linha horizontal, todos do mesmo tamanho e na mesma escala, com os pés na mesma altura em todos os quadros: 1. Preparação: inclinado para trás, espada erguida acima do ombro. 2. Avanço: corpo projetado para a frente, espada começando a descer. 3. Golpe: espada no meio do arco, à frente do corpo, capa esvoaçando. 4. Pós-golpe: espada baixa à frente, corpo ainda inclinado. Virado para a direita, fundo branco liso, sem texto, sem números, sem efeitos de impacto.

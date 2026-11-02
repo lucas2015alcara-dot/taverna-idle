@@ -68,6 +68,7 @@ th { color: var(--suave); font-weight: 500; }
 .labCtrl { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: center; font-size: 12px; color: var(--suave); padding: 0 8px; }
 .labCtrl label { display: flex; align-items: center; gap: 6px; }
 .labCtrl input { width: 90px; accent-color: var(--brasa); }
+.labCtrl select { font: inherit; background: var(--painel2); color: var(--texto); border: 1px solid var(--linha); border-radius: 8px; padding: 4px 6px; }
 .gire { margin: 0; color: var(--suave); font-size: 13px; }
 @media (orientation: landscape) { .gire { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -99,7 +100,13 @@ th { color: var(--suave); font-weight: 500; }
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   let telaAtual = 'taverna', heroiAberto = null, anim = null;
   const ARTE = { fen: 'assets/fen.webp', brutus: 'assets/brutus.webp', ondina: 'assets/ondina.webp', vex: 'assets/vex.webp', rosa: 'assets/rosa.webp', morgrath: 'assets/morgrath.webp' };
+  ['floresta', 'fortaleza', 'abismo', 'sombra'].forEach((f) => (ARTE['rec-' + f] = 'assets/rec-' + f + '.webp'));
+  Object.entries({ floresta: 'espinhoso', fortaleza: 'golem', abismo: 'lodo', sombra: 'espectro', luz: 'sentinela', trevas: 'cria' }).forEach(([f, n]) => (ARTE['mon-' + f] = 'assets/mon-' + n + '.webp'));
   const IMG = {}; Object.entries(ARTE).forEach(([k, src]) => { const im = new Image(); im.src = src; IMG[k] = im; });
+  // quadros de ataque gerados no GPT (mesma escala; pe = posição dos pés na largura)
+  const QUADROS = { morgrath: [{"w": 377, "h": 495, "pe": 0.585}, {"w": 432, "h": 496, "pe": 0.503}, {"w": 575, "h": 408, "pe": 0.356}, {"w": 448, "h": 405, "pe": 0.544}].map((m, i) => { const im = new Image(); im.src = 'assets/morgrath-q' + (i + 1) + '.webp'; return { ...m, im }; }) };
+  // imagem de um herói pela definição (campeão ou recruta da facção)
+  function imgDef(def) { const d = TL.DEFS[def]; if (!d) return null; return IMG[def] || (d.recruta ? IMG['rec-' + d.fac] : null); }
   const FUNDO = new Image(); FUNDO.src = 'assets/cenario-clareira.webp';
   const pronta = (im) => !!im && im.complete && im.naturalWidth > 0;
   function quandoPronta(im, fn) { if (pronta(im)) fn(); else im.addEventListener('load', fn, { once: true }); }
@@ -145,7 +152,7 @@ th { color: var(--suave); font-weight: 500; }
     canvas.width = 56 * dpr; canvas.height = 56 * dpr;
     const c = canvas.getContext('2d'); c.scale(dpr, dpr);
     const moldura = () => { if (d.rar) { c.strokeStyle = TL.RARIDADES[d.rar].cor; c.lineWidth = 3; c.beginPath(); c.roundRect(1.5, 1.5, 53, 53, 9); c.stroke(); } };
-    if (IMG[def]) { quandoPronta(IMG[def], () => { c.clearRect(0, 0, 56, 56); const im = IMG[def], h = 50, w = (h * im.naturalWidth) / im.naturalHeight; c.drawImage(im, 28 - w / 2, 3, w, h); moldura(); }); return; }
+    if (imgDef(def)) { quandoPronta(imgDef(def), () => { c.clearRect(0, 0, 56, 56); const im = imgDef(def), h = d.recruta ? 44 : 50, w = (h * im.naturalWidth) / im.naturalHeight; c.drawImage(im, 28 - w / 2, 3, w, h); moldura(); }); return; }
     moldura(); desenhaHeroi(c, 28, 30, 0.72, d, 0, false);
   }
   function cena(canvas, W, H) {
@@ -258,7 +265,7 @@ th { color: var(--suave); font-weight: 500; }
 
   // ---------- Animação de ataque corpo a corpo (só a lógica do movimento) ----------
   // Ajustes: velocidade (1 = 1 segundo), distância do avanço (1 = até o alvo) e intensidade do golpe.
-  const CFG_ATAQUE = { velocidade: 1, distancia: 1, intensidade: 1 };
+  const CFG_ATAQUE = { velocidade: 1, distancia: 1, intensidade: 1, modo: 'codigo' }; // modo: 'codigo' ou 'quadros'
   const FASES = { prep: 0.2, avanco: 0.42, golpe: 0.6 }; // frações da duração; o resto é o retorno
   const MOMENTO_IMPACTO = 0.5;
   const suave = (k) => k * k * (3 - 2 * k), entra = (k) => k * k * k, sai = (k) => 1 - Math.pow(1 - k, 3);
@@ -352,12 +359,26 @@ th { color: var(--suave); font-weight: 500; }
       }
       if (u.hit > 0) c.filter = 'brightness(2.1)';
       const queda = u.morto ? u.morto * 30 : 0;
-      const img = !u.monstro && IMG[u.ref];
+      const img = u.monstro ? IMG['mon-' + u.fac] : imgDef(u.ref);
+      const altura = u.monstro ? (u.chefe ? 125 : 92) : TL.DEFS[u.ref] && TL.DEFS[u.ref].recruta ? 88 : 108;
+      // quadro de ataque do GPT, quando o modo "quadros" estiver ligado e o herói tiver quadros
+      let quadro = null;
+      if (CFG_ATAQUE.modo === 'quadros' && u.acao && u.acao.melee && QUADROS[u.ref]) {
+        const p = u.acao.t / u.acao.dur, q = QUADROS[u.ref];
+        const iq = p < FASES.prep ? 0 : p < FASES.avanco ? 1 : p < FASES.golpe ? 2 : p < 0.78 ? 3 : -1;
+        if (iq >= 0 && pronta(q[iq].im)) quadro = q[iq];
+      }
       let topo;
-      if (img && pronta(img)) {
-        const h = 108 * s * (1 + resp * 0.012), w = (h * img.naturalWidth) / img.naturalHeight;
+      if (quadro) {
+        const h = altura * s * (quadro.h / 440), w = (h * quadro.w) / quadro.h;
         c.translate(x, y + queda); if (dir < 0) c.scale(-1, 1);
-        if (rot || esc !== 1) { c.translate(0, -h * 0.35); c.rotate(rot); c.scale(esc, esc); c.translate(0, h * 0.35); }
+        c.drawImage(quadro.im, -w * quadro.pe, -h, w, h);
+        topo = y - altura * s;
+      } else if (img && pronta(img)) {
+        const h = altura * s * (1 + resp * 0.012), w = (h * img.naturalWidth) / img.naturalHeight;
+        c.translate(x, y + queda); if (dir < 0 && !u.monstro) c.scale(-1, 1);
+        if (u.monstro && u.hp > 0) c.translate(0, Math.sin(relogio * 3 + u.fase) * 2);
+        if ((rot || esc !== 1) && CFG_ATAQUE.modo !== 'quadros') { c.translate(0, -h * 0.35); c.rotate(rot * (dir < 0 && u.monstro ? -1 : 1)); c.scale(esc, esc); c.translate(0, h * 0.35); }
         c.drawImage(img, -w / 2, -h, w, h);
         topo = y - h;
       } else if (u.monstro) {
@@ -514,6 +535,7 @@ th { color: var(--suave); font-weight: 500; }
         <label for="lVel">Velocidade <input id="lVel" type="range" min="0.5" max="2" step="0.1" value="${CFG_ATAQUE.velocidade}"></label>
         <label for="lDist">Avanço <input id="lDist" type="range" min="0.3" max="1.2" step="0.05" value="${CFG_ATAQUE.distancia}"></label>
         <label for="lInt">Intensidade <input id="lInt" type="range" min="0.3" max="2" step="0.1" value="${CFG_ATAQUE.intensidade}"></label>
+        <label for="lModo">Modo <select id="lModo"><option value="codigo">Imagem + código</option><option value="quadros">Quadros do GPT</option></select></label>
         <button class="b prim" id="bAtacar">Atacar</button><button class="b" id="bSair">Sair</button>
       </div>`;
     document.body.appendChild(div);
@@ -528,6 +550,7 @@ th { color: var(--suave); font-weight: 500; }
     const boneco = { id: 'b0', nome: 'Boneco de treino', fac: 'floresta', funcao: 'tanque', hpMax: 99999, monstro: true };
     const arena = criaArena([heroi], [boneco], false);
     [['lVel', 'velocidade'], ['lDist', 'distancia'], ['lInt', 'intensidade']].forEach(([id, k]) => ($('#' + id).oninput = (e) => (CFG_ATAQUE[k] = +e.target.value)));
+    $('#lModo').value = CFG_ATAQUE.modo; $('#lModo').onchange = (e) => (CFG_ATAQUE.modo = e.target.value);
     $('#bAtacar').onclick = () => {
       const dano = Math.round(800 + Math.random() * 400 * CFG_ATAQUE.intensidade);
       arena.aplica({ t: 'acao', de: 'a0', hab: false, golpes: [{ alvo: 'b0', dano, crit: Math.random() < 0.2, vant: false }], curas: [] }, false);
@@ -612,7 +635,7 @@ th { color: var(--suave); font-weight: 500; }
     const dpr = window.devicePixelRatio || 1; cv.width = 96 * dpr; cv.height = 96 * dpr;
     const c = cv.getContext('2d'); c.scale(dpr, dpr); const d = TL.DEFS[def];
     const moldura = () => { if (d.rar) { c.strokeStyle = TL.RARIDADES[d.rar].cor; c.lineWidth = 4; c.beginPath(); c.roundRect(2, 2, 92, 92, 12); c.stroke(); } };
-    if (IMG[def]) { quandoPronta(IMG[def], () => { c.clearRect(0, 0, 96, 96); const im = IMG[def], h = 86, w = (h * im.naturalWidth) / im.naturalHeight; c.drawImage(im, 48 - w / 2, 5, w, h); moldura(); }); return; }
+    if (imgDef(def)) { quandoPronta(imgDef(def), () => { c.clearRect(0, 0, 96, 96); const im = imgDef(def), h = d.recruta ? 78 : 86, w = (h * im.naturalWidth) / im.naturalHeight; c.drawImage(im, 48 - w / 2, 5, w, h); moldura(); }); return; }
     moldura(); desenhaHeroi(c, 48, 54, 1.25, d, 0, false);
   }
 
