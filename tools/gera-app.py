@@ -42,8 +42,17 @@ html = f'''<!doctype html>
 // trava a tela deitada no app instalado; no navegador comum, o aviso "Gire o celular" cobre a tela em pé
 (function () {{
   const trava = () => {{ try {{ const p = screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape'); if (p && p.catch) p.catch(() => {{}}); }} catch (_) {{}} }};
+  const appInstalado = matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: standalone)').matches;
+  // em aba do navegador (app ainda não verificado), a trava só funciona em tela cheia: pede no primeiro toque
+  const telaCheia = () => {{
+    const el = document.documentElement;
+    if (!appInstalado && !document.fullscreenElement && el.requestFullscreen) {{
+      try {{ el.requestFullscreen({{ navigationUI: 'hide' }}).then(trava, () => {{}}); }} catch (_) {{}}
+    }} else trava();
+  }};
   trava();
-  addEventListener('pointerdown', trava, {{ once: true }});
+  addEventListener('pointerdown', telaCheia);
+  document.addEventListener('fullscreenchange', trava);
   document.addEventListener('visibilitychange', () => {{ if (!document.hidden) trava(); }});
 }})();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {{}}));
