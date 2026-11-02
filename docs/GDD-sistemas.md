@@ -62,6 +62,19 @@ Vida, Ataque, Defesa e Velocidade. Secundários: chance e dano crítico, precis�
 
 O herói nasce com 1★ a 5★. Os de 1★ a 3★ servem principalmente como material de fusão; os de 4★ e 5★ são o objetivo da coleção.
 
+### Raridade (decidido em 02/11)
+
+Separada das estrelas: entre os heróis que nascem 5★ há quatro raridades, e a raridade mostra quem é mais forte. Os de origem 1★–4★ não têm raridade (são material de fusão).
+
+| Raridade | Força base | Chance entre os 5★ |
+| --- | --- | --- |
+| Raro | 100% | 55% |
+| Épico | 112% | 30% |
+| Lendário | 125% | 12% |
+| Mítico | 140% | 3% |
+
+Limite de estrelas por origem: 1★–3★ vão até 4★; 4★ vai até 5★; só os que nascem 5★ chegam a 6★.
+
 ## Combate
 
 Batalha automática por turnos, equipe de **6 heróis: 2 na frente e 4 atrás**. Maior Velocidade age primeiro.
@@ -152,6 +165,17 @@ Ganhos idle pela fase mais alta vencida, acumulando até 12 horas. Coleta rápid
 | Torre da Fenda | Capítulo 2 | Andares difíceis, recompensas |
 | Masmorras diárias | Capítulo 3 | Material de evolução por facção |
 | Arena PvP | Depois do lançamento | Contra outros jogadores |
+
+## Contas e jogador novato (decidido em 02/11)
+
+- **Cadastro opcional:** começa como visitante; ao criar conta com e-mail ganha um herói 5★ exclusivo (uma vez por conta) e salvamento na nuvem. Servidor previsto: Supabase (plano grátis).
+- **Calendário do novato (7 dias):** login diário com recompensas e missões, além do calendário normal de 30 dias.
+- **Redes sociais:** sem recompensa por curtir/compartilhar (proibido pela Meta). Usar códigos de resgate postados no Facebook, TikTok e Discord, e recompensa por indicação.
+- **Estúdio:** nome e página na fase 3, junto com a política de privacidade.
+
+## Protótipo cinza (game/)
+
+6 heróis, um por facção: Fen (Floresta, Arqueiro, Raro), Brutus (Fortaleza, Tanque, Épico), Ondina (Abismo, Mago, Raro), Vex (Sombra, Assassino, Épico), Irmã Rosa (Luz, Suporte, Lendário), Morgrath (Trevas, Guerreiro, Mítico). Mais recrutas genéricos 1★–4★ por facção comum como material de fusão. Inclui: taverna com AFK, campanha de 30 fases (chefe a cada 10), combate por turnos com vantagem de facção, subir nível, evolução por fusão, invocação comum/premium com garantia e tabela de chances, salvamento local.
 
 ## Decisões
 
