@@ -53,3 +53,16 @@ Anexar a imagem original do herói e pedir 4 quadros numa linha, mesma escala, p
 - Ondina (feitiço): junta energia / gira / lança / recupera.
 - Irmã Rosa (bênção): reza / ergue a mão / mão no alto / recupera.
 Feito em 02/11: os 6 heróis têm 4 quadros cada. Corpo a corpo segue preparação/avanço/golpe/retorno; à distância e cura trocam quadros em 25%/50%/78%/95% da ação, com a flecha/magia saindo no quadro 3 e a cura em 58%. Teste de animação tem seletor de herói.
+
+## Ultimates (feito em 02/11, por código)
+| Herói | Efeito |
+| --- | --- |
+| Fen | 16 flechas de folha caem do céu sobre os inimigos; dano quando cada uma cai |
+| Ondina | Onda azul atravessa o campo inimigo; dano quando a onda passa por cada um |
+| Brutus | Anel dourado no chão e barreira dourada na frente da equipe; tremor |
+| Vex | Some em fumaça roxa, reaparece atrás do alvo virado para ele, golpeia e volta |
+| Irmã Rosa | Coluna de luz em cada aliado e pétalas de rosa caindo |
+| Morgrath | Rachadura de fogo escuro no chão com chamas subindo; tremor forte |
+| Monstros | Aura vermelha de fúria |
+
+Sombra: silhueta borrada da própria imagem, achatada e projetada para trás/direita (luz do alto à esquerda), mais uma sombra de contato pequena nos pés.
