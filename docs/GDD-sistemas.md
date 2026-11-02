@@ -12,6 +12,10 @@ Idle RPG mobile de coleção de heróis, em fantasia medieval com tom equilibrad
 - **Plataforma:** Android (Google Play), HTML5/JavaScript empacotado via PWABuilder
 - **Arte:** cartoon gerado no GPT; protótipos com arte desenhada por código
 - **Status:** pré-produção. Este documento define os sistemas antes de história e arte.
+- **Orientação:** celular deitado (paisagem), como Idle Heroes (decidido em 02/11).
+- **Tela principal:** ilustração da taverna e arredores com áreas clicáveis (balcão = invocação, quadro de missões = campanha etc.).
+- **Batalha:** 6 heróis agrupados à esquerda (2 frente + 4 atrás, em diagonal), inimigos à direita, cenário ilustrado ao fundo.
+- **Arte:** imagens inteiras do GPT (cenários, tela principal, heróis) animadas por código; teste em `docs/arte/prompts-teste.md`.
 
 Todos os números abaixo são propostas iniciais, para ajustar na planilha de economia e nos testes.
 
