@@ -267,6 +267,61 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
 @keyframes tremeC { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
 .rAcoes { position: relative; display: flex; gap: 10px; min-height: 40px; }
 @media (orientation: portrait) { .rCartas { grid-template-columns: repeat(3, calc(var(--ch) * .75)); } }
+.camp { position: relative; display: flex; overflow: hidden; background: #1E140A; }
+.mapa { position: relative; flex: 1; overflow: hidden; }
+.mapaFundo { position: absolute; inset: 0; background: url(assets/cenario-clareira.webp) center 60% / cover no-repeat; filter: brightness(.8) saturate(1.05); }
+.mapaFundo::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 55%, transparent 45%, rgba(20,10,4,.6) 100%); }
+.mapaFundo.cap2 { filter: brightness(.65) saturate(.6) sepia(.25); } .mapaFundo.cap3 { filter: brightness(.6) hue-rotate(-40deg) saturate(1.2); }
+.capTopo { position: absolute; left: 50%; top: 8px; z-index: 3; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; }
+.capNome { font: 400 19px var(--display); color: #FFF3D6; text-shadow: 0 1px 0 #000; text-align: center; line-height: 1; white-space: nowrap;
+  padding: 4px 8px 6px; border-style: solid; border-width: 0 14px; border-image: url(assets/ui/etiqueta.webp) 28 34 fill / 13px 15px stretch; filter: drop-shadow(0 3px 4px rgba(0,0,0,.5)); }
+.capNome small { display: block; font: 700 10px var(--corpo); color: #E0C58A; letter-spacing: .6px; text-transform: uppercase; margin-bottom: 2px; }
+.capSeta { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--ourox); background: #3A2213; color: #FFF3D6; font: 400 22px/1 var(--display); cursor: pointer; padding: 0 0 3px; box-shadow: 0 2px 0 #2A170B; }
+.capSeta:disabled { opacity: .35; cursor: default; }
+.trilhaBox { position: absolute; left: 6%; right: 6%; top: 20%; bottom: 10%; }
+.trilha { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.trilha path { fill: none; stroke: #FFE7B0; stroke-width: 5; stroke-dasharray: 2 14; stroke-linecap: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 2px 2px rgba(0,0,0,.6)); }
+.no { position: absolute; z-index: 2; width: 38px; height: 38px; margin: 0; padding: 0; border-radius: 50%; cursor: pointer; transform: translate(-50%, -50%);
+  left: 0; top: 0; border: 3px solid #2A170B; font: 400 17px/1 var(--display); color: #fff; text-shadow: 0 1px 0 #000; }
+.no.feita { background: radial-gradient(circle at 40% 35%, #FFE38A, #E8A030 60%, #A8641A); }
+.no.atual { width: 46px; height: 46px; background: radial-gradient(circle at 40% 35%, #C8F57A, #5DBB2E 60%, #2E7A16); box-shadow: 0 0 0 3px #FFE7B0, 0 0 16px 4px rgba(170,255,120,.6); animation: pulsaNo 1.6s ease-in-out infinite; }
+.no.travada { background: radial-gradient(circle at 40% 35%, #8A8070, #554C40 70%); cursor: default; }
+.no.travada span::before { content: "🔒"; font-size: 14px; filter: grayscale(1) brightness(1.4); }
+.no.chefe { width: 54px; height: 54px; border-color: #5A1010; }
+.no.chefe.travada { background: radial-gradient(circle at 40% 35%, #B05050, #5A1A1A 70%); }
+.no.chefe span::after { content: ""; position: absolute; left: 50%; top: -14px; width: 30px; height: 18px; transform: translateX(-50%);
+  background: linear-gradient(#FFD66B, #C98A1E); clip-path: polygon(0 100%, 0 30%, 20% 60%, 35% 0, 50% 55%, 65% 0, 80% 60%, 100% 30%, 100% 100%); }
+.no.sel { outline: 3px solid #fff; outline-offset: 3px; }
+.pino { position: absolute; left: 50%; bottom: 100%; width: 22px; height: 30px; transform: translateX(-50%); margin-bottom: 4px;
+  background: radial-gradient(circle at 50% 35%, #fff 0 4px, transparent 5px), #E8402E; clip-path: path("M11 30 C 11 30 0 17 0 11 A 11 11 0 0 1 22 11 C 22 17 11 30 11 30 Z"); animation: pulaPino 1s ease-in-out infinite; }
+@keyframes pulsaNo { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.08); } }
+@keyframes pulaPino { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -6px); } }
+.painelFase { width: min(38%, 330px); flex: none; display: flex; flex-direction: column; gap: 7px; padding: 10px 12px 14px; overflow: auto;
+  background: repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 46px, rgba(0,0,0,.07) 46px 48px), var(--madeira); border-left: 3px solid var(--ourox); box-shadow: -4px 0 10px rgba(0,0,0,.45); }
+.pfTopo { display: flex; align-items: center; gap: 6px; } .pfTopo h2 { margin: 0; font-size: 22px; }
+.tagChefe, .tagOk { font: 800 10px var(--corpo); text-transform: uppercase; letter-spacing: .5px; padding: 2px 7px; border-radius: 6px; }
+.tagChefe { background: #C0392B; color: #fff; } .tagOk { background: #8EE08A; color: #173404; }
+.pfIni { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.mIni { position: relative; aspect-ratio: 1; border-radius: 10px; background: radial-gradient(circle, #5A3A22, #2A170B); border: 2px solid #2A170B; box-shadow: inset 0 0 0 1px rgba(255,220,150,.25); }
+.mIni.chefe { border-color: #C0392B; box-shadow: 0 0 8px rgba(255,80,60,.6); }
+.mIni img { position: absolute; inset: 6%; width: 88%; height: 88%; object-fit: contain; }
+.mIni .mFac { inset: auto -3px -3px auto; width: 40%; height: 40%; }
+.pfDica { margin: 0; font: 700 12px var(--corpo); color: #E8DCC4; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.pfDica span { display: inline-flex; align-items: center; gap: 2px; opacity: .75; } .pfDica span.tem { opacity: 1; color: #8EE08A; }
+.pfDica .ico { width: 18px; height: 18px; }
+.pfRec { background: rgba(20,10,4,.45); border: 1px solid rgba(255,220,150,.2); border-radius: 10px; padding: 5px 8px 6px; }
+.pfRec small { font: 700 10px var(--corpo); color: #E0C58A; text-transform: uppercase; letter-spacing: .5px; }
+.pfRec div { display: flex; flex-wrap: wrap; gap: 2px 10px; font: 400 15px var(--display); color: #fff; text-shadow: 0 1px 0 #000; }
+.pfRec div span { display: inline-flex; align-items: center; gap: 3px; } .pfRec .ico { width: 22px; height: 22px; }
+.pfRec .recebida { opacity: .45; filter: grayscale(.6); }
+.pfLinha { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 8px; font: 700 12px var(--corpo); color: #E8DCC4; }
+.pfLinha span { display: inline-flex; align-items: center; gap: 3px; } .pfLinha b { font: 400 15px var(--display); color: #fff; }
+.pfLinha .ico { width: 20px; height: 20px; }
+.bLutar { margin-top: auto; flex: none; font-size: 22px !important; padding: 8px 16px 10px !important; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.bLutar .ico { width: 28px; height: 28px; }
+@media (max-height: 380px) { .painelFase { gap: 4px; padding: 7px 10px 12px; } .pfTopo h2 { font-size: 18px; } .pfRec { padding: 3px 8px 4px; } .pfRec div { font-size: 13px; } .pfRec .ico { width: 18px; height: 18px; }
+  .bLutar { font-size: 18px !important; padding: 5px 12px 7px !important; } .pfIni { grid-template-columns: repeat(6, minmax(0, 38px)); } .pfLinha { font-size: 11px; } .bLutar .ico { width: 22px; height: 22px; } .no { width: 32px; height: 32px; } .no.atual { width: 40px; height: 40px; } .no.chefe { width: 46px; height: 46px; } }
+@media (orientation: portrait) { .camp { flex-direction: column; height: auto !important; } .mapa { min-height: 60vw; } .painelFase { width: auto; border-left: 0; border-top: 3px solid var(--ourox); } }
 @media (prefers-reduced-motion: reduce) { .raio, .artGrande { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .brilho, .selo.cheio { animation: none; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -492,41 +547,70 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
 
   // ---------- Campanha ----------
   function chipFac(fac) { const f = TL.FACCOES[fac]; return `<span class="chip" style="color:${f.claro}">${f.nome}</span>`; }
+  // ---------- Campanha (mapa do capítulo) ----------
+  const CAPITULOS = ['Clareira da Fenda', 'Muralhas Partidas', 'Coração da Fenda']; // nomes provisórios
+  const MON_ARQ = { floresta: 'espinhoso', fortaleza: 'golem', abismo: 'lodo', sombra: 'espectro', luz: 'sentinela', trevas: 'cria' };
+  // caminho das 10 fases no mapa (frações da área do mapa)
+  const TRILHA = [[0.08, 0.80], [0.20, 0.62], [0.33, 0.76], [0.45, 0.58], [0.38, 0.38], [0.52, 0.24], [0.66, 0.36], [0.78, 0.56], [0.88, 0.40], [0.86, 0.16]];
+  let capVisto = null, faseVista = null;
   function telaCampanha() {
-    const n = Math.min(E.fase + 1, TL.TOTAL_FASES);
-    const fim = E.fase >= TL.TOTAL_FASES;
-    const info = TL.infoFase(n), ini = TL.inimigosDaFase(n), rec = TL.recompensaFase(n);
+    const atual = Math.min(E.fase + 1, TL.TOTAL_FASES), fim = E.fase >= TL.TOTAL_FASES;
+    const capAtual = TL.infoFase(atual).cap;
+    if (capVisto == null) capVisto = capAtual;
+    if (faseVista == null || TL.infoFase(faseVista).cap !== capVisto) faseVista = capVisto === capAtual ? atual : (capVisto - 1) * 10 + 1;
+    const n = faseVista, info = TL.infoFase(n), ini = TL.inimigosDaFase(n), rec = TL.recompensaFase(n);
+    const vencida = n <= E.fase, travada = n > E.fase + 1;
     const facsEq = new Set(E.equipe.map((u) => TL.DEFS[TL.heroi(E, u).def].fac));
     const poderEq = E.equipe.reduce((a, u) => a + TL.poder(TL.heroi(E, u)), 0);
-    const dicas = [...new Set(ini.map((m) => m.fac))].map((fac) => {
-      const quem = Object.keys(TL.VENCE).find((k) => TL.VENCE[k] === fac);
-      return `${chipFac(fac)} perde para ${TL.FACCOES[quem].nome}${facsEq.has(quem) ? ' <span class="ok">(você tem)</span>' : ''}`;
-    });
+    const facsIni = [...new Set(ini.map((m) => m.fac))];
+    const contra = facsIni.map((fac) => Object.keys(TL.VENCE).find((k) => TL.VENCE[k] === fac));
+    const tx = TL.taxaAfk(E);
+    const nos = TRILHA.map(([x, y], i) => {
+      const f = (capVisto - 1) * 10 + i + 1, est = f <= E.fase ? 'feita' : f === E.fase + 1 ? 'atual' : 'travada';
+      return `<button class="no ${est}${(i + 1) % 10 === 0 ? ' chefe' : ''}${f === n ? ' sel' : ''}" data-f="${f}" style="left:${x * 100}%;top:${y * 100}%" aria-label="Fase ${i + 1}${est === 'travada' ? ' (bloqueada)' : ''}">
+        <span>${est === 'feita' ? '✓' : est === 'travada' ? '' : i + 1}</span>${f === E.fase + 1 && !fim ? '<i class="pino"></i>' : ''}</button>`;
+    }).join('');
+    const linha = 'M' + TRILHA.map(([x, y]) => `${x * 1000} ${y * 600}`).join(' L');
+    const botao = travada ? `<button class="b prim bLutar" disabled>Bloqueada</button>`
+      : vencida ? `<button class="b bLutar" id="bLutar">Lutar de novo</button>`
+      : `<button class="b prim bLutar" id="bLutar">${ico('poder')} Lutar</button>`;
     $('#tela').innerHTML = `
-      <div class="cartao">
-        <div class="linha entre"><h2>${fim ? 'Campanha concluída' : info.nome}${info.chefe && !fim ? ' · Chefe' : ''}</h2><span class="suave peq">${E.fase}/${TL.TOTAL_FASES}</span></div>
-        <canvas id="cPrev" aria-label="Prévia da batalha"></canvas>
-        <div class="linha entre">
-          <span class="suave peq">Poder da equipe: <b style="color:var(--texto)">${fmt(poderEq)}</b></span>
-          <button class="b prim" id="bLutar">${fim ? 'Repetir fase 30' : 'Lutar'}</button>
+      <div class="camp" id="camp">
+        <div class="mapa">
+          <div class="mapaFundo cap${capVisto}"></div>
+          <div class="capTopo">
+            <button class="capSeta" id="capAnt" ${capVisto <= 1 ? 'disabled' : ''} aria-label="Capítulo anterior">‹</button>
+            <div class="capNome"><small>Capítulo ${capVisto}</small>${CAPITULOS[capVisto - 1]}</div>
+            <button class="capSeta" id="capProx" ${capVisto >= 3 || capVisto >= capAtual ? 'disabled' : ''} aria-label="Próximo capítulo">›</button>
+          </div>
+          <div class="trilhaBox"><svg class="trilha" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true"><path d="${linha}"/></svg>
+          ${nos}</div>
         </div>
-      </div>
-      <div class="cartao">
-        <h3>Inimigos</h3>
-        <div class="lista peq">${dicas.map((d) => '<div>' + d + '</div>').join('')}</div>
-        <p class="suave peq" style="margin:0">Vantagem de facção: +30% de dano. Ciclo: Floresta vence Abismo, Abismo vence Fortaleza, Fortaleza vence Sombra, Sombra vence Floresta. Luz e Trevas vencem uma à outra.</p>
-        ${fim ? '' : `<p class="peq" style="margin:0">Primeira vitória: ${fmt(rec.ouro)} ouro, ${fmt(rec.xp)} xp, ${rec.gemas} gemas${rec.pergC ? ', ' + rec.pergC + ' perg. comuns' : ''}${rec.pergP ? ', 1 perg. premium' : ''}.</p>`}
+        <aside class="painelFase">
+          <div class="pfTopo"><h2>Fase ${info.idx}</h2>${info.chefe ? '<span class="tagChefe">Chefe</span>' : ''}${vencida ? '<span class="tagOk">Vencida</span>' : ''}</div>
+          <div class="pfIni">${ini.map((m) => `<div class="mIni${m.chefe ? ' chefe' : ''}"><img src="assets/mon-${MON_ARQ[m.fac]}.webp" alt="${esc(m.nome)}"><img class="mFac" src="assets/ui/fac-${m.fac}.webp" alt=""></div>`).join('')}</div>
+          <p class="pfDica">Vantagem: ${contra.map((f) => `<span class="${facsEq.has(f) ? 'tem' : ''}">${ico('fac-' + f)} ${TL.FACCOES[f].nome}</span>`).join(' ')}</p>
+          <div class="pfRec">
+            <small>${vencida ? 'Recompensa já recebida' : 'Primeira vitória'}</small>
+            <div class="${vencida ? 'recebida' : ''}">
+              <span>${ico('ouro')} ${fmt(rec.ouro)}</span><span>${ico('xp')} ${fmt(rec.xp)}</span><span>${ico('gema')} ${rec.gemas}</span>
+              ${rec.pergC ? `<span>${ico('perg-comum')} ${rec.pergC}</span>` : ''}${rec.pergP ? `<span>${ico('perg-premium')} 1</span>` : ''}
+            </div>
+          </div>
+          <div class="pfLinha"><span>${ico('poder')} Sua equipe <b>${fmt(poderEq)}</b></span><span>${ico('bau')} AFK <b>${fmt(tx.ouro)}</b> ouro/min</span></div>
+          ${botao}
+        </aside>
       </div>`;
-    ajustaLargura(Math.min(proporcaoTela(), 2.1));
-    const c = cena($('#cPrev'), AW, AH);
-    const lado = TL.montaLado(E);
-    const A = lado.map((u, i) => ({ ...u, id: 'a' + i, hpMax: u.hpMax })), B = ini.map((m, i) => ({ ...m, id: 'b' + i, hpMax: m.hp, monstro: true }));
-    const arena = criaArena(A, B, false);
-    pararAnim(); let ult = performance.now();
-    (function loop(t) { const dt = Math.min(0.05, (t - ult) / 1000); ult = t; arena.desenha(c, dt); anim = requestAnimationFrame(loop); })(ult);
-    $('#bLutar').onclick = () => {
-      const res = TL.lutarFase(E, fim ? TL.TOTAL_FASES : n);
-      salva(); topo();
+    $('#tela').classList.add('cheia');
+    const camp = $('#camp');
+    const ajusta = () => { const top = $('#topo').getBoundingClientRect().bottom, nav = document.querySelector('nav').getBoundingClientRect().height; camp.style.height = Math.max(260, innerHeight - top - nav) + 'px'; };
+    ajusta(); addEventListener('resize', ajusta); telaSai = () => removeEventListener('resize', ajusta);
+    camp.querySelectorAll('.no').forEach((b) => (b.onclick = () => { const f = +b.dataset.f; if (f > E.fase + 1) return; faseVista = f; render(); }));
+    $('#capAnt').onclick = () => { capVisto--; faseVista = null; render(); };
+    $('#capProx').onclick = () => { capVisto++; faseVista = null; render(); };
+    if ($('#bLutar')) $('#bLutar').onclick = () => {
+      const res = TL.lutarFase(E, n);
+      salva(); topo(); capVisto = null; faseVista = null;
       abreBatalha(res);
     };
   }
