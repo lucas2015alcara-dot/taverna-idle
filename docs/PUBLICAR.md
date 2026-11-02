@@ -33,7 +33,7 @@ Dentro do .zip vem a **chave de assinatura** (arquivo `.keystore`) e um arquivo 
 
 ## O que é esperado neste teste
 - O jogo abre em tela cheia e deitado.
-- Pode aparecer uma **barra de endereço** do navegador no topo. É normal neste teste: some quando colocarmos o arquivo `assetlinks.json` na raiz do domínio. No GitHub Pages isso exige um segundo repositório chamado `lucas2015alcara-dot.github.io` (ou um domínio próprio). Fazemos isso perto da publicação.
+- **Barra do navegador:** resolvida com `.well-known/assetlinks.json` no repositório `lucas2015alcara-dot.github.io` (raiz do domínio). Pacote do teste: `io.github.lucas2015alcara_dot.twa`. Se gerar o app com outra chave ou outro pacote, atualizar esse arquivo. Na Play Store, adicionar também a impressão digital do Google (Play Console → App integrity → App signing).
 - Funciona sem internet depois de aberto uma vez (as fontes podem trocar pela fonte padrão offline).
 
 ## Na próxima vez que gerar o app
