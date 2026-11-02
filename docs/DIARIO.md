@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Corrigida a faixa transparente no meio do selo "Ganhos AFK" (recorte das placas esticáveis deixava o centro vazio); mesmo ajuste nas placas de recurso e na aba ativa | Próxima tela (campanha) ou som |
 | 2026-11-02 | Invocação no visual do mockup do GPT: arco de pedra com runas (redemoinho animado por código dentro), painéis azul (Comum) e roxo (Premium), botões verdes na comum, botão Chances com ícone, verso de carta do GPT na revelação, fundo da clareira | Lucas testar; próxima tela (campanha) ou som |
 | 2026-11-02 | Tela de invocação nova: portal animado no centro (anel de pedra, runas, redemoinho), altares Comum e Premium com custo em ícones, barra da garantia de 5★, botão Chances (tabela exigida pela Play). Animação: portal carrega na cor do melhor resultado (azul/roxo/dourado), cartas saem viradas e viram uma a uma; 5★ treme, brilha e dá clarão; tocar vira na hora, Revelar tudo, Invocar de novo | Lucas tirar print e levar ao GPT; prompt de fundo próprio do portal; som |
 | 2026-11-02 | Nova ilustração da taverna do GPT (mais respiro em cima e embaixo): preenche a tela inteira sem laterais e sem cortar torre/chaminé; áreas clicáveis e etiquetas recalibradas | Tela de invocação com animação do portal |
