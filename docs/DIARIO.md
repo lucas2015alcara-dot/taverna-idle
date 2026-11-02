@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Batalha ocupa a tela inteira em qualquer proporção (16:9 a 21:9+): largura lógica da arena se adapta, cenário corta mais o céu, formação centralizada e times levemente afastados em telas largas | Tela principal da taverna (prompt do GPT) |
 | 2026-11-02 | Ultimates dos 6 heróis com quadros e efeitos do GPT (flecha, onda, barreira, fumaça, luz, rachadura). Vex agora salta como o Morgrath; Brutus golpeia do lugar | Tela principal da taverna com áreas clicáveis; depois som |
 | 2026-11-02 | Ultimate do Morgrath refeita com arte do GPT: 4 quadros (concentra, salto, crava, pós) + efeito de rachadura com fundo preto removido, na camada do chão | Lucas aprovar; prompts das ultimates dos outros 5 heróis |
 | 2026-11-02 | Ultimates com efeito próprio para os 6 heróis + fúria dos monstros; botão Ultimate e 3 bonecos no Teste de animação; sombra no formato do personagem projetada no chão | Tela principal da taverna com áreas clicáveis; depois som |

@@ -62,8 +62,8 @@ th { color: var(--suave); font-weight: 500; }
 .arena { position: fixed; inset: 0; z-index: 30; background: #0B0907; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
 .palco { position: relative; }
-.palco canvas { border-radius: 10px; }
-.arenaBotoes { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
+.palco canvas { border-radius: 0; display: block; }
+.arenaBotoes { position: absolute; right: max(10px, env(safe-area-inset-right, 0px)); bottom: max(10px, env(safe-area-inset-bottom, 0px)); display: flex; gap: 6px; }
 .arenaBotoes .b { padding: 6px 12px; font-size: 13px; background: rgba(34,29,22,.85); }
 .labCtrl { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: center; font-size: 12px; color: var(--suave); padding: 0 8px; }
 .labCtrl label { display: flex; align-items: center; gap: 6px; }
@@ -275,6 +275,7 @@ th { color: var(--suave); font-weight: 500; }
         <p class="suave peq" style="margin:0">Vantagem de facção: +30% de dano. Ciclo: Floresta vence Abismo, Abismo vence Fortaleza, Fortaleza vence Sombra, Sombra vence Floresta. Luz e Trevas vencem uma à outra.</p>
         ${fim ? '' : `<p class="peq" style="margin:0">Primeira vitória: ${fmt(rec.ouro)} ouro, ${fmt(rec.xp)} xp, ${rec.gemas} gemas${rec.pergC ? ', ' + rec.pergC + ' perg. comuns' : ''}${rec.pergP ? ', 1 perg. premium' : ''}.</p>`}
       </div>`;
+    ajustaLargura(Math.min(proporcaoTela(), 2.1));
     const c = cena($('#cPrev'), AW, AH);
     const lado = TL.montaLado(E);
     const A = lado.map((u, i) => ({ ...u, id: 'a' + i, hpMax: u.hpMax })), B = ini.map((m, i) => ({ ...m, id: 'b' + i, hpMax: m.hp, monstro: true }));
@@ -471,10 +472,13 @@ th { color: var(--suave); font-weight: 500; }
   }
 
   // ---------- Arena (paisagem 16:9) ----------
-  const AW = 640, AH = 360;
+  const AH = 360, AW_BASE = 640;
+  let AW = 640, OX = 0; // largura lógica da arena (muda com a tela) e deslocamento para centralizar a formação
+  function ajustaLargura(proporcao) { AW = Math.round(Math.max(AW_BASE, Math.min(AH * 2.4, AH * proporcao))); OX = ((AW - AW_BASE) / 2) * 0.6; } // times se afastam um pouco nas telas largas
+  const proporcaoTela = () => { const w = innerWidth, h = innerHeight; return Math.max(w, h) / Math.max(1, Math.min(w, h)); };
   const POS = [[238, 250], [254, 322], [154, 234], [170, 302], [74, 260], [90, 330]];
   const CORPO_A_CORPO = { guerreiro: 1, tanque: 1, assassino: 1 };
-  function posBase(id) { const p = POS[Math.min(+id.slice(1), 5)]; return id[0] === 'a' ? [p[0], p[1]] : [AW - p[0], p[1]]; }
+  function posBase(id) { const p = POS[Math.min(+id.slice(1), 5)]; return id[0] === 'a' ? [p[0] + OX, p[1]] : [AW - p[0] - OX, p[1]]; }
   function escalaProf(y) { return 0.9 + ((y - 230) / 100) * 0.18; }
 
   // sombra: silhueta preta e borrada da própria imagem, achatada no chão (cacheada por imagem)
@@ -664,7 +668,7 @@ th { color: var(--suave); font-weight: 500; }
         depois(disparo, () => fx.onda(x0, x1, 200, 345, durOnda));
         tempoGolpe = (k) => disparo + Math.max(0.05, ((uni[ev.golpes[k].alvo].x - x0) / (x1 - x0)) * durOnda);
       } else if (ult === 'brutus') { // Muralha: batida do escudo e barreira dourada na frente da equipe
-        depois(impacto, () => { fx.anel(a.x, a.y, '#E0B54A', 110); fx.barreira(a.id[0] === 'a' ? 300 : AW - 300, 200, 345); tremor = 0.3; });
+        depois(impacto, () => { fx.anel(a.x, a.y, '#E0B54A', 110); fx.barreira(a.id[0] === 'a' ? OX + 300 : AW - OX - 300, 200, 345); tremor = 0.3; });
       } else if (ult === 'vex' && salto) { // Golpe nas Costas: explode em fumaça, salta e golpeia
         const nuvem = (x, y, w) => (pronta(FX_IMG.fumaca) ? fx.nuvem(FX_IMG.fumaca, x, y, w, 0.7) : fx.fumaca(x, y + 40));
         nuvem(a.x, a.y - 40, 150);
@@ -675,7 +679,7 @@ th { color: var(--suave); font-weight: 500; }
         depois(dur * 0.62, () => fx.fumaca(alvo.x + (a.id[0] === 'a' ? 58 : -58), alvo.y));
         depois(dur * 0.78, () => fx.fumaca(a.x, a.y));
       } else if (ult === 'rosa') { // Prece: luz dourada e pétalas sobre os aliados
-        depois(dur * (temUlt ? 0.42 : 0.45), () => { lado(a.id[0]).forEach((x) => fx.coluna(x.x, x.y)); fx.petalas(a.id[0] === 'a' ? 40 : AW - 320, a.id[0] === 'a' ? 320 : AW - 40, 200, 340, 26); });
+        depois(dur * (temUlt ? 0.42 : 0.45), () => { lado(a.id[0]).forEach((x) => fx.coluna(x.x, x.y)); fx.petalas(a.id[0] === 'a' ? OX + 40 : AW - OX - 320, a.id[0] === 'a' ? OX + 320 : AW - OX - 40, 200, 340, 26); });
       } else if (ult === 'morgrath') { // Golpe Brutal: salta, crava a espada e o chão racha em fogo escuro
         depois(salto ? dur * 0.22 : 0, () => fx.anel(a.x, a.y, '#E24B4A', 70));
         depois(impacto, () => {
@@ -706,7 +710,7 @@ th { color: var(--suave); font-weight: 500; }
       });
       c.save();
       if (tremor > 0) { tremor -= dt; c.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 4); }
-      if (pronta(FUNDO)) c.drawImage(FUNDO, 0, 0, AW, AH); else rr(c, 0, 0, AW, AH, 0, '#2a4a24');
+      if (pronta(FUNDO)) { const fh = (AW * FUNDO.naturalHeight) / FUNDO.naturalWidth; c.drawImage(FUNDO, 0, -(fh - AH) * 0.7, AW, fh); } else rr(c, 0, 0, AW, AH, 0, '#2a4a24');
       fx.desenhaChao(c, dt);
       Object.values(uni).sort((a, b) => a.y - b.y).forEach((u) => { if (u.morto < 1) desenhaUnidade(c, u); });
       for (let i = proj.length - 1; i >= 0; i--) { const p = proj[i]; p.t += dt; if (p.t >= p.dur) proj.splice(i, 1); else if (p.t > 0) desenhaProj(c, p); }
@@ -743,8 +747,9 @@ th { color: var(--suave); font-weight: 500; }
       <p class="gire">Gire o celular para jogar deitado.</p>`;
     document.body.appendChild(div);
     const cv = $('#cArena');
+    ajustaLargura(innerWidth / Math.max(1, innerHeight));
     function ajusta() {
-      const pad = 8, w = Math.min(innerWidth - pad * 2, ((innerHeight - pad * 2) * AW) / AH);
+      const w = Math.min(innerWidth, (innerHeight * AW) / AH);
       cv.style.width = w + 'px'; cv.style.height = (w * AH) / AW + 'px';
       $('.palco', div).style.width = w + 'px';
     }
@@ -790,9 +795,10 @@ th { color: var(--suave); font-weight: 500; }
         <button class="b prim" id="bAtacar">Atacar</button><button class="b prim" id="bUlt">Ultimate</button><button class="b" id="bSair">Sair</button>
       </div>`;
     document.body.appendChild(div);
+    ajustaLargura(innerWidth / Math.max(1, innerHeight - 70));
     const cv = $('#cLab');
     function ajusta() {
-      const w = Math.min(innerWidth - 16, ((innerHeight - 96) * AW) / AH);
+      const w = Math.min(innerWidth, ((innerHeight - 70) * AW) / AH);
       cv.style.width = w + 'px'; cv.style.height = (w * AH) / AW + 'px';
     }
     ajusta(); addEventListener('resize', ajusta);
