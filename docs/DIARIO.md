@@ -2,6 +2,7 @@
 
 | Data | O que foi feito | Próximo passo |
 | --- | --- | --- |
+| 2026-11-02 | Ultimates dos 6 heróis com quadros e efeitos do GPT (flecha, onda, barreira, fumaça, luz, rachadura). Vex agora salta como o Morgrath; Brutus golpeia do lugar | Tela principal da taverna com áreas clicáveis; depois som |
 | 2026-11-02 | Ultimate do Morgrath refeita com arte do GPT: 4 quadros (concentra, salto, crava, pós) + efeito de rachadura com fundo preto removido, na camada do chão | Lucas aprovar; prompts das ultimates dos outros 5 heróis |
 | 2026-11-02 | Ultimates com efeito próprio para os 6 heróis + fúria dos monstros; botão Ultimate e 3 bonecos no Teste de animação; sombra no formato do personagem projetada no chão | Tela principal da taverna com áreas clicáveis; depois som |
 | 2026-11-02 | Quadros de ação dos 6 heróis no jogo (Fen, Ondina, Irmã Rosa, Brutus, Vex + Morgrath): tiro, feitiço e bênção sincronizados com flecha/magia/cura; seletor de herói no Teste de animação | Ultimates (efeitos por herói) e tela principal da taverna |

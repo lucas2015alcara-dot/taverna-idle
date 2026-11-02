@@ -116,9 +116,9 @@ th { color: var(--suave); font-weight: 500; }
   const META_QUADROS = {"morgrath":[{"w":377,"h":495,"pe":0.585},{"w":432,"h":496,"pe":0.503},{"w":575,"h":408,"pe":0.356},{"w":448,"h":405,"pe":0.544}],"rosa":[{"w":279,"h":415,"pe":0.519},{"w":293,"h":418,"pe":0.496},{"w":294,"h":421,"pe":0.5},{"w":280,"h":419,"pe":0.519}],"ondina":[{"w":316,"h":458,"pe":0.561},{"w":390,"h":457,"pe":0.453},{"w":379,"h":418,"pe":0.477},{"w":364,"h":406,"pe":0.489}],"fen":[{"w":332,"h":435,"pe":0.458},{"w":345,"h":418,"pe":0.444},{"w":383,"h":436,"pe":0.417},{"w":363,"h":417,"pe":0.459}],"vex":[{"w":355,"h":418,"pe":0.494},{"w":464,"h":406,"pe":0.265},{"w":403,"h":427,"pe":0.524},{"w":462,"h":429,"pe":0.498}],"brutus":[{"w":419,"h":497,"pe":0.509},{"w":511,"h":425,"pe":0.405},{"w":452,"h":388,"pe":0.517},{"w":412,"h":418,"pe":0.468}]};
   const QUADROS = {}; Object.entries(META_QUADROS).forEach(([n, lista]) => (QUADROS[n] = lista.map((m, i) => { const im = new Image(); im.src = 'assets/' + n + '-q' + (i + 1) + '.webp'; return { ...m, im }; })));
   // quadros da ultimate (GPT) e imagens de efeito (fundo preto removido)
-  const META_ULT = { morgrath: [{"w":443,"h":344,"pe":0.588},{"w":417,"h":491,"pe":0.416},{"w":435,"h":405,"pe":0.596},{"w":461,"h":402,"pe":0.627}] };
+  const META_ULT = {"morgrath":[{"w":443,"h":344,"pe":0.588},{"w":417,"h":491,"pe":0.416},{"w":435,"h":405,"pe":0.596},{"w":461,"h":402,"pe":0.627}],"rosa":[{"w":277,"h":416,"pe":0.49},{"w":267,"h":416,"pe":0.503},{"w":303,"h":415,"pe":0.494},{"w":282,"h":415,"pe":0.494}],"vex":[{"w":462,"h":395,"pe":0.498},{"w":484,"h":454,"pe":0.255},{"w":457,"h":488,"pe":0.649},{"w":416,"h":397,"pe":0.518}],"brutus":[{"w":346,"h":507,"pe":0.495},{"w":404,"h":382,"pe":0.464},{"w":348,"h":343,"pe":0.492},{"w":405,"h":418,"pe":0.489}],"ondina":[{"w":355,"h":555,"pe":0.566},{"w":387,"h":521,"pe":0.515},{"w":548,"h":431,"pe":0.345},{"w":392,"h":458,"pe":0.41}],"fen":[{"w":351,"h":451,"pe":0.457},{"w":360,"h":470,"pe":0.49},{"w":378,"h":470,"pe":0.47},{"w":338,"h":435,"pe":0.458}]};
   const QUADROS_ULT = {}; Object.entries(META_ULT).forEach(([n, lista]) => (QUADROS_ULT[n] = lista.map((m, i) => { const im = new Image(); im.src = 'assets/' + n + '-u' + (i + 1) + '.webp'; return { ...m, im }; })));
-  const FX_IMG = {}; ['rachadura'].forEach((n) => { const im = new Image(); im.src = 'assets/fx-' + n + '.webp'; FX_IMG[n] = im; });
+  const FX_IMG = {}; ['rachadura', 'luz', 'fumaca', 'onda', 'barreira', 'flecha'].forEach((n) => { const im = new Image(); im.src = 'assets/fx-' + n + '.webp'; FX_IMG[n] = im; });
   // imagem de um herói pela definição (campeão ou recruta da facção)
   function imgDef(def) { const d = TL.DEFS[def]; if (!d) return null; return IMG[def] || (d.recruta ? IMG['rec-' + d.fac] : null); }
   const FUNDO = new Image(); FUNDO.src = 'assets/cenario-clareira.webp';
@@ -342,7 +342,7 @@ th { color: var(--suave); font-weight: 500; }
       // Vex: fumaça roxa
       fumaca(x, y) { for (let i = 0; i < 10; i++) add({ tipo: 'fumaca', x: x + (R() - 0.5) * 40, y: y - R() * 80, r: 10 + R() * 14, vy: -20 - R() * 30, l: 0.45 + R() * 0.25, max: 0.7 }); },
       // Irmã Rosa: coluna de luz e pétalas
-      coluna(x, y) { add({ tipo: 'coluna', x, y, l: 0.9, max: 0.9 }); },
+      coluna(x, y) { add({ tipo: 'coluna', x, y, l: 1.1, max: 1.1 }); },
       petalas(x0, x1, y0, y1, n) { for (let i = 0; i < n; i++) add({ tipo: 'petala', x: x0 + R() * (x1 - x0), y: y0 - R() * 160, yFim: y0 + R() * (y1 - y0), vx: 10 + R() * 25, vy: 50 + R() * 40, rot: R() * 6, vr: (R() - 0.5) * 5, l: 2.2, max: 2.2 }); },
       // Morgrath: rachadura de fogo escuro no chão
       rachadura(x, y) {
@@ -368,6 +368,8 @@ th { color: var(--suave); font-weight: 500; }
           c.restore();
         }
       },
+      // imagem de efeito centrada em (x, y), crescendo e sumindo (fumaça, explosões)
+      nuvem(im, x, y, w, dur) { add({ tipo: 'nuvem', im, x, y, w, l: dur, max: dur }); },
       // monstros: aura de fúria
       furia(x, y) { add({ tipo: 'anel', x, y, cor: '#E24B4A', raio: 60, l: 0.45, max: 0.45 }); add({ tipo: 'anel', x, y, cor: '#F09595', raio: 40, l: 0.35, max: 0.35 }); },
 
@@ -386,11 +388,22 @@ th { color: var(--suave); font-weight: 500; }
           } else if (e.tipo === 'chama') {
             e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 60 * dt;
             c.globalAlpha = Math.min(1, e.l / 0.3); bola(c, e.x, e.y, e.r * (0.5 + e.l), e.cor); c.globalAlpha = 1;
+          } else if (e.tipo === 'nuvem') {
+            if (!pronta(e.im)) continue;
+            const esc = 0.55 + 0.6 * Math.min(1, k * 2.5), fade = Math.min(1, e.l / (e.max * 0.6));
+            const w = e.w * esc, h = (w * e.im.naturalHeight) / e.im.naturalWidth;
+            c.save(); c.globalAlpha = fade; c.drawImage(e.im, e.x - w / 2, e.y - h / 2, w, h); c.restore();
           } else if (e.tipo === 'flechaCai') {
             e.t += dt; if (e.t < 0) continue;
             const p = Math.min(1, e.t / e.dur);
             if (p >= 1 && !e.caiu) { e.caiu = true; e.l = 0.25; e.max = 0.25; this.folhas(e.x1, e.y1); }
             const x = e.x0 + (e.x1 - e.x0) * p, y = e.y0 + (e.y1 - e.y0) * p;
+            if (pronta(FX_IMG.flecha)) {
+              const im = FX_IMG.flecha, w = 78, h = (w * im.naturalHeight) / im.naturalWidth;
+              c.save(); c.globalAlpha = e.caiu ? e.l / 0.25 : 1; c.translate(x, y); c.rotate(Math.atan2(e.y1 - e.y0, e.x1 - e.x0));
+              c.drawImage(im, -w * 0.85, -h / 2, w, h); c.restore();
+              continue;
+            }
             c.save(); c.globalAlpha = e.caiu ? e.l / 0.25 : 1; c.translate(x, y); c.rotate(Math.atan2(e.y1 - e.y0, e.x1 - e.x0));
             c.strokeStyle = '#8A5A2B'; c.lineWidth = 3; c.beginPath(); c.moveTo(-22, 0); c.lineTo(10, 0); c.stroke();
             c.fillStyle = '#97C459'; c.beginPath(); c.ellipse(-20, -4, 6, 2.5, -0.4, 0, 7); c.ellipse(-20, 4, 6, 2.5, 0.4, 0, 7); c.fill();
@@ -400,6 +413,10 @@ th { color: var(--suave); font-weight: 500; }
             e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 140 * dt; e.rot += e.vr * dt;
             c.save(); c.globalAlpha = Math.min(1, e.l / 0.3); c.translate(e.x, e.y); c.rotate(e.rot); c.fillStyle = '#7FB33A';
             c.beginPath(); c.ellipse(0, 0, 5, 2.5, 0, 0, 7); c.fill(); c.restore();
+          } else if (e.tipo === 'onda' && pronta(FX_IMG.onda)) {
+            e.t += dt; const p = Math.min(1, e.t / e.dur), frente = e.x0 + (e.x1 - e.x0) * p, fade = Math.min(1, e.l / 0.35);
+            const im = FX_IMG.onda, h = (e.y1 - e.y0) * 1.15, w = (h * im.naturalWidth) / im.naturalHeight;
+            c.save(); c.globalAlpha = fade * Math.min(1, e.t * 6); c.drawImage(im, frente - w * 0.9, e.y1 - h + 12, w, h); c.restore();
           } else if (e.tipo === 'onda') {
             e.t += dt; const p = Math.min(1, e.t / e.dur), frente = e.x0 + (e.x1 - e.x0) * p, fade = Math.min(1, e.l / 0.35);
             const cauda = Math.max(e.x0 - 30, frente - 190);
@@ -414,6 +431,11 @@ th { color: var(--suave); font-weight: 500; }
             c.stroke();
             for (let j = 0; j < 6; j++) bola(c, frente - 6 + Math.sin(j * 7 + e.t * 9) * 6, e.y0 + ((j * 37 + e.t * 160) % (e.y1 - e.y0)), 3.5, '#E6F1FB');
             c.restore();
+          } else if (e.tipo === 'barreira' && pronta(FX_IMG.barreira)) {
+            const sobe = Math.min(1, k * 5), fade = Math.min(1, e.l / 0.4), im = FX_IMG.barreira;
+            const h = (e.y1 - e.y0) * 0.95, w = (h * im.naturalWidth) / im.naturalHeight;
+            c.save(); c.globalAlpha = 0.9 * fade; c.beginPath(); c.rect(e.x - w, e.y1 - h * sobe - 4, w * 2, h * sobe + 8); c.clip();
+            c.drawImage(im, e.x - w / 2, e.y1 - h, w, h); c.restore();
           } else if (e.tipo === 'barreira') {
             const sobe = Math.min(1, k * 5), fade = Math.min(1, e.l / 0.4), h = (e.y1 - e.y0) * sobe;
             c.save(); c.globalAlpha = 0.22 * fade; c.fillStyle = '#FAC775';
@@ -429,6 +451,10 @@ th { color: var(--suave); font-weight: 500; }
           } else if (e.tipo === 'fumaca') {
             e.y += e.vy * dt; c.save(); c.globalAlpha = 0.55 * (e.l / e.max); c.fillStyle = k < 0.5 ? '#534AB7' : '#3C3489';
             bola(c, e.x, e.y, e.r * (0.7 + k * 0.8), c.fillStyle); c.restore();
+          } else if (e.tipo === 'coluna' && pronta(FX_IMG.luz)) {
+            const fade = Math.sin(Math.min(1, k) * Math.PI), im = FX_IMG.luz, w = 92, h = 240;
+            c.save(); c.globalAlpha = fade; c.drawImage(im, e.x - w / 2, e.y + 12 - h, w, h);
+            c.globalCompositeOperation = 'lighter'; c.globalAlpha = fade * 0.3; c.drawImage(im, e.x - w / 2, e.y + 12 - h, w, h); c.restore();
           } else if (e.tipo === 'coluna') {
             const fade = Math.sin(Math.min(1, k) * Math.PI);
             const g = c.createLinearGradient(e.x, 0, e.x, e.y);
@@ -498,7 +524,9 @@ th { color: var(--suave); font-weight: 500; }
       const dir = u.id[0] === 'a' ? 1 : -1;
       if (u.acao) {
         const p = Math.min(1, u.acao.t / u.acao.dur);
-        if (u.acao.salto && u.acao.alvo) {
+        if (u.acao.fixo) {
+          // ultimate parada (Brutus): só treme no impacto
+        } else if (u.acao.salto && u.acao.alvo) {
           // ultimate com salto: concentra, salta até o alvo, crava a espada e volta
           const alc = Math.max(0, Math.abs(u.acao.alvo.x - u.x) - 85), dyAlvo = u.acao.alvo.y - u.y;
           if (p >= 0.22 && p < 0.5) { const k = (p - 0.22) / 0.28, e2 = k * k * (3 - 2 * k); dx = dir * alc * e2; dy = dyAlvo * e2 - Math.sin(k * Math.PI) * 95; }
@@ -535,9 +563,9 @@ th { color: var(--suave); font-weight: 500; }
       const altura = u.monstro ? (u.chefe ? 125 : 92) : TL.DEFS[u.ref] && TL.DEFS[u.ref].recruta ? 88 : 108;
       // quadro de ataque do GPT, quando o modo "quadros" estiver ligado e o herói tiver quadros
       let quadro = null;
-      if (CFG_ATAQUE.modo === 'quadros' && u.acao && u.acao.salto && QUADROS_ULT[u.ref]) {
-        const p = u.acao.t / u.acao.dur, q = QUADROS_ULT[u.ref];
-        const iq = p < 0.22 ? 0 : p < 0.5 ? 1 : p < 0.7 ? 2 : p < 0.84 ? 3 : -1;
+      if (CFG_ATAQUE.modo === 'quadros' && u.acao && u.acao.ultQ && QUADROS_ULT[u.ref]) {
+        const p = u.acao.t / u.acao.dur, q = QUADROS_ULT[u.ref], L = u.acao.limites;
+        const iq = p < L[0] ? 0 : p < L[1] ? 1 : p < L[2] ? 2 : p < L[3] ? 3 : -1;
         if (iq >= 0 && pronta(q[iq].im)) quadro = q[iq];
       } else if (CFG_ATAQUE.modo === 'quadros' && u.acao && QUADROS[u.ref]) {
         const p = u.acao.t / u.acao.dur, q = QUADROS[u.ref];
@@ -621,13 +649,16 @@ th { color: var(--suave); font-weight: 500; }
       const melee = !!CORPO_A_CORPO[a.funcao] && !!alvo && ev.golpes.length === 1;
       const comQuadros = CFG_ATAQUE.modo === 'quadros' && !!QUADROS[a.ref];
       let dur = melee ? (ev.hab ? 1.15 : 1) / CFG_ATAQUE.velocidade : comQuadros ? (ev.hab ? 1.1 : 0.95) / CFG_ATAQUE.velocidade : ev.hab ? 1.05 : 0.72;
-      const disparo = !melee && comQuadros ? dur * 0.5 : 0; // flecha/magia sai no quadro 3
       const ult = ev.hab ? (a.monstro ? 'furia' : a.ref) : null;
-      const salto = !!ult && melee && comQuadros && !!QUADROS_ULT[ult];
-      if (salto) dur = 1.55 / CFG_ATAQUE.velocidade;
-      a.acao = { t: 0, dur, melee, alvo, teleporte: ult === 'vex' && melee, salto };
+      const temUlt = !!ult && comQuadros && !!QUADROS_ULT[ult];          // ultimate com quadros do GPT
+      const salto = temUlt && melee && (ult === 'morgrath' || ult === 'vex');
+      const fixo = temUlt && melee && !salto;                             // Brutus: golpeia do lugar
+      if (salto) dur = 1.55 / CFG_ATAQUE.velocidade; else if (fixo) dur = 1.5 / CFG_ATAQUE.velocidade; else if (temUlt) dur = 1.45 / CFG_ATAQUE.velocidade;
+      const limites = salto ? [0.22, 0.5, 0.7, 0.84] : [0.22, 0.45, 0.75, 0.97];
+      const disparo = !melee && comQuadros ? dur * (temUlt ? 0.45 : 0.5) : 0; // flecha/magia sai no quadro 3
+      a.acao = { t: 0, dur, melee, alvo, teleporte: ult === 'vex' && melee && !temUlt, salto, fixo, ultQ: temUlt, limites };
       if (ev.hab) { a.brilho = 1; banner = { txt: a.nome + ' · ' + ev.nomeHab, l: 1.3 }; tremor = ev.golpes.length > 1 ? 0.35 : 0.18; }
-      const impacto = melee ? dur * MOMENTO_IMPACTO : disparo + 0.38;
+      const impacto = salto ? dur * 0.5 : fixo ? dur * 0.32 : melee ? dur * MOMENTO_IMPACTO : disparo + 0.38;
       const lado = (id) => Object.values(uni).filter((x) => x.id[0] === id && x.hp > 0);
       const depois = (t, fn) => pend.push({ em: relogio + t, fn });
       let semProjetil = false, tempoGolpe = null;
@@ -643,13 +674,17 @@ th { color: var(--suave); font-weight: 500; }
         tempoGolpe = (k) => disparo + Math.max(0.05, ((uni[ev.golpes[k].alvo].x - x0) / (x1 - x0)) * durOnda);
       } else if (ult === 'brutus') { // Muralha: batida do escudo e barreira dourada na frente da equipe
         depois(impacto, () => { fx.anel(a.x, a.y, '#E0B54A', 110); fx.barreira(a.id[0] === 'a' ? 300 : AW - 300, 200, 345); tremor = 0.3; });
+      } else if (ult === 'vex' && salto) { // Golpe nas Costas: explode em fumaça, salta e golpeia
+        const nuvem = (x, y, w) => (pronta(FX_IMG.fumaca) ? fx.nuvem(FX_IMG.fumaca, x, y, w, 0.7) : fx.fumaca(x, y + 40));
+        nuvem(a.x, a.y - 40, 150);
+        depois(impacto, () => { nuvem(alvo.x, alvo.y - 45, 190); tremor = 0.25; });
       } else if (ult === 'vex') { // Golpe nas Costas: some e reaparece atrás do alvo
         depois(dur * FASES.prep, () => fx.fumaca(a.x, a.y));
         depois(dur * FASES.avanco, () => fx.fumaca(alvo.x + (a.id[0] === 'a' ? 58 : -58), alvo.y));
         depois(dur * 0.62, () => fx.fumaca(alvo.x + (a.id[0] === 'a' ? 58 : -58), alvo.y));
         depois(dur * 0.78, () => fx.fumaca(a.x, a.y));
       } else if (ult === 'rosa') { // Prece: luz dourada e pétalas sobre os aliados
-        depois(dur * 0.45, () => { lado(a.id[0]).forEach((x) => fx.coluna(x.x, x.y)); fx.petalas(a.id[0] === 'a' ? 40 : AW - 320, a.id[0] === 'a' ? 320 : AW - 40, 200, 340, 26); });
+        depois(dur * (temUlt ? 0.42 : 0.45), () => { lado(a.id[0]).forEach((x) => fx.coluna(x.x, x.y)); fx.petalas(a.id[0] === 'a' ? 40 : AW - 320, a.id[0] === 'a' ? 320 : AW - 40, 200, 340, 26); });
       } else if (ult === 'morgrath') { // Golpe Brutal: salta, crava a espada e o chão racha em fogo escuro
         depois(salto ? dur * 0.22 : 0, () => fx.anel(a.x, a.y, '#E24B4A', 70));
         depois(impacto, () => {
@@ -660,11 +695,12 @@ th { color: var(--suave); font-weight: 500; }
       } else if (ult === 'furia') {
         fx.furia(a.x, a.y);
       }
-      if (melee && !salto) pend.push({ em: relogio + impacto, fn: () => { const dirA = a.id[0] === 'a' ? 1 : -1; fx.golpe(alvo.x - dirA * 10, alvo.y - 55, dirA, a.fac, CFG_ATAQUE.intensidade * (ev.hab ? 1.3 : 1)); alvo.tremor = 1 + CFG_ATAQUE.intensidade; } });
+      if (melee && !salto) pend.push({ em: relogio + impacto + (fixo ? 0.12 : 0), fn: () => { const dirA = a.id[0] === 'a' ? 1 : -1; fx.golpe(alvo.x - dirA * 10, alvo.y - 55, dirA, a.fac, CFG_ATAQUE.intensidade * (ev.hab ? 1.3 : 1)); alvo.tremor = 1 + CFG_ATAQUE.intensidade; } });
       if (!melee && !semProjetil) ev.golpes.forEach((g, k) => proj.push({ de: a, para: uni[g.alvo], t: -disparo - k * 0.09, dur: 0.38, tipo: a.funcao === 'arqueiro' ? 'arqueiro' : 'magia', fac: a.fac }));
       ev.golpes.forEach((g, k) => pend.push({ em: relogio + (tempoGolpe ? tempoGolpe(k) : impacto + (melee ? 0 : k * 0.09)), fn: () => golpeia(g, false) }));
-      ev.curas.forEach((g) => pend.push({ em: relogio + (comQuadros ? dur * 0.58 : 0.45), fn: () => cura(g, false) }));
+      ev.curas.forEach((g) => pend.push({ em: relogio + (temUlt ? dur * 0.55 : comQuadros ? dur * 0.58 : 0.45), fn: () => cura(g, false) }));
       const fimGolpes = tempoGolpe ? Math.max(...ev.golpes.map((g, k) => tempoGolpe(k)), 0) + 0.15 : 0;
+      if (temUlt) return Math.max(dur * 0.95, fimGolpes, impacto + 0.25);
       return Math.max(salto ? dur * 0.92 : melee ? dur * 0.85 : comQuadros ? Math.max(dur, impacto + 0.1) : dur, fimGolpes, ult === 'rosa' || ult === 'brutus' ? dur + 0.3 : 0);
     }
     const pend = [];

@@ -74,7 +74,8 @@ Formato aprovado no teste do Morgrath:
 - Código cuida de tempo, salto/deslocamento, tremor, anéis e partículas.
 
 Morgrath (Golpe Brutal): concentra (0–22%), salta em arco até o alvo (22–50%), crava a espada (50%, impacto), pós-impacto (70–84%), volta. Duração 1,55 s.
-Próximos: Fen, Ondina, Brutus, Vex, Irmã Rosa no mesmo formato.
+Feito em 02/11 para os 6 heróis. Tempos: salto (Morgrath, Vex) quadros em 0/22/50/70/84%, impacto em 50%; Brutus fica parado, impacto em 32%; à distância/cura quadros em 0/22/45/75/97%, disparo em 45%, cura em 55%.
+Efeitos por imagem: fx-flecha (chuva do Fen), fx-onda (Ondina), fx-barreira (Brutus), fx-fumaca (Vex), fx-luz (Irmã Rosa), fx-rachadura (Morgrath). Se a imagem não carregar, cai no efeito desenhado por código.
 
 ## Prompts das ultimates (enviados em 02/11)
 Para cada herói: anexar a imagem original; gerar (a) folha de 4 quadros, fundo branco; (b) efeito com fundo preto puro.
