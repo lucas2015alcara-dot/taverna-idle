@@ -44,7 +44,7 @@ function sessao(e, horas) {
   let lutas = 0;
   while (e.fase < TL.TOTAL_FASES && lutas < 5) { lutas++; const r = TL.lutarFase(e, e.fase + 1); if (!r.venceu) break; }
 }
-let bot = TL.novoEstado();
+let bot = TL.novoEstado(); bot.seed = 4242;
 const marcos = {};
 for (let dia = 1; dia <= 14; dia++) {
   for (let s = 0; s < 6; s++) sessao(bot, 4);
