@@ -19,3 +19,22 @@ Mais:
 - Ferramenta: DragonBones (grátis) ou Spine (pago) exportam esses dois arquivos; o jogo lê com um leitor próprio ou uma biblioteca de leitura.
 
 Custo: o GPT tem dificuldade de gerar peças que se encaixam perfeitamente. Caminho realista: pedir o herói em pose neutra (braços afastados do corpo) e recortar as peças manualmente num editor, ou contratar um artista só para o recorte.
+
+## Teste quadro a quadro (a fazer)
+Prompt para o ChatGPT, com a imagem do Morgrath anexada:
+
+> Usando o personagem da imagem anexada, sem mudar nada no visual dele (mesma armadura, cores, chifres, capa e espada), crie uma folha de animação (sprite sheet) de ataque com 4 quadros, lado a lado numa única linha horizontal, todos do mesmo tamanho e na mesma escala, com os pés na mesma altura em todos os quadros: 1. Preparação: inclinado para trás, espada erguida acima do ombro. 2. Avanço: corpo projetado para a frente, espada começando a descer. 3. Golpe: espada no meio do arco, à frente do corpo, capa esvoaçando. 4. Pós-golpe: espada baixa à frente, corpo ainda inclinado. Virado para a direita, fundo branco liso, sem texto, sem números, sem efeitos de impacto.
+
+Se vier consistente: recortar os 4 quadros, alinhar pelos pés e comparar com a animação por código.
+
+## Ultimates (proposta de efeito visual)
+| Herói | Ultimate | Efeito |
+| --- | --- | --- |
+| Fen | Saraivada | Chuva de flechas de folhas caindo do alto |
+| Brutus | Muralha | Batida do escudo no chão e barreira dourada na frente da equipe |
+| Ondina | Chuva Arcana | Onda que atravessa o campo inimigo |
+| Vex | Golpe nas Costas | Some em fumaça roxa e reaparece atrás do alvo |
+| Irmã Rosa | Prece | Luz dourada e pétalas de rosa sobre os aliados |
+| Morgrath | Golpe Brutal | Rachadura de fogo escuro no chão |
+
+Monstros: uma "fúria" simples por tipo.
