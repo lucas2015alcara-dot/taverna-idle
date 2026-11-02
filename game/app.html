@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taverna Idle</title>
+<meta name="theme-color" content="#16130E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icones/icone-192.png">
+<link rel="apple-touch-icon" href="icones/icone-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: app de uma coluna (tela de celular) — barra de recursos no topo, conteúdo, navegação fixa embaixo. Visual único escuro, de taverna à noite. */
+:root {
+  --bg: #16130E; --painel: #221D16; --painel2: #2C261D; --linha: #3E3628; --texto: #EFE7D6; --suave: #A99C84;
+  --brasa: #E58A52; --ouro: #E0B54A; --gema: #8FB8F0; --bom: #7FCB8F; --ruim: #EE8A7E;
+  --display: "Alegreya SC", Georgia, serif; --corpo: "Work Sans", system-ui, sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--texto); font-family: var(--corpo); font-size: 14px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+.app { max-width: 480px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+.topo { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--linha);
+  display: flex; gap: 6px; flex-wrap: wrap; padding: 8px max(12px, env(safe-area-inset-right, 0px)) 8px max(12px, env(safe-area-inset-left, 0px)); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.rec { display: inline-flex; align-items: center; gap: 5px; background: var(--painel); border: 1px solid var(--linha); border-radius: 999px; padding: 3px 9px; font-variant-numeric: tabular-nums; font-size: 12.5px; }
+.rec i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+main { flex: 1; padding: 14px max(12px, env(safe-area-inset-right, 0px)) 90px max(12px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 14px; }
+nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 6; background: var(--painel); border-top: 1px solid var(--linha);
+  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+nav .itens { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+nav button { background: none; border: 0; color: var(--suave); font: 500 12px var(--corpo); padding: 8px 2px; border-radius: 10px; cursor: pointer; }
+nav button[aria-current="page"] { color: var(--texto); background: var(--painel2); }
+h1, h2, h3 { font-family: var(--display); font-weight: 500; margin: 0; text-wrap: balance; }
+h1 { font-size: 22px; } h2 { font-size: 18px; } h3 { font-size: 15px; }
+.cartao { background: var(--painel); border: 1px solid var(--linha); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.linha { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.entre { justify-content: space-between; }
+.suave { color: var(--suave); }
+.peq { font-size: 12px; }
+button.b { font: 600 14px var(--corpo); border-radius: 10px; padding: 10px 14px; cursor: pointer; border: 1px solid var(--linha); background: var(--painel2); color: var(--texto); }
+button.b.prim { background: var(--brasa); border-color: var(--brasa); color: #24170C; }
+button.b:disabled { opacity: .45; cursor: default; }
+button:focus-visible { outline: 2px solid var(--ouro); outline-offset: 2px; }
+canvas { display: block; width: 100%; height: auto; border-radius: 12px; }
+.chip { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.lista { display: flex; flex-direction: column; gap: 8px; }
+.heroi { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: center; background: var(--painel); border: 1px solid var(--linha); border-radius: 12px; padding: 8px; cursor: pointer; text-align: left; color: inherit; font: inherit; width: 100%; }
+.heroi canvas { width: 56px; height: 56px; background: var(--painel2); border-radius: 10px; }
+.heroi .nome { font-weight: 600; }
+.estrelas { color: var(--ouro); letter-spacing: 1px; font-size: 12px; }
+.grade2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.stat { background: var(--painel2); border-radius: 10px; padding: 8px 10px; }
+.stat b { display: block; font-size: 16px; font-variant-numeric: tabular-nums; }
+.aviso { font-size: 13px; color: var(--ruim); min-height: 18px; margin: 0; }
+.ok { color: var(--bom); }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+td, th { padding: 5px 4px; border-bottom: 1px solid var(--linha); text-align: left; font-variant-numeric: tabular-nums; }
+th { color: var(--suave); font-weight: 500; }
+.resultado { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.resultado .r { background: var(--painel2); border-radius: 10px; padding: 4px; text-align: center; font-size: 10.5px; border: 1px solid var(--linha); }
+.resultado canvas { width: 100%; height: auto; }
+.barra { height: 8px; background: var(--painel2); border-radius: 99px; overflow: hidden; }
+.barra > div { height: 100%; background: var(--ouro); }
+.sobre { position: relative; }
+.faixa { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(16, 13, 9, .78); border-radius: 12px; text-align: center; padding: 12px; }
+.faixa h2 { font-size: 26px; }
+@media (orientation: landscape) { .app, nav .itens { max-width: 920px; } }
+.arena { position: fixed; inset: 0; z-index: 30; background: #0B0907; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.palco { position: relative; }
+.palco canvas { border-radius: 10px; }
+.arenaBotoes { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
+.arenaBotoes .b { padding: 6px 12px; font-size: 13px; background: rgba(34,29,22,.85); }
+.labCtrl { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: center; font-size: 12px; color: var(--suave); padding: 0 8px; }
+.labCtrl label { display: flex; align-items: center; gap: 6px; }
+.labCtrl input { width: 70px; accent-color: var(--brasa); }
+.labCtrl select { font: inherit; background: var(--painel2); color: var(--texto); border: 1px solid var(--linha); border-radius: 8px; padding: 4px 6px; }
+.gire { margin: 0; color: var(--suave); font-size: 13px; }
+@media (orientation: landscape) { .gire { display: none; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topo" id="topo" aria-label="Recursos"></div>
+  <main id="tela"></main>
+</div>
+<nav aria-label="Navegação"><div class="itens">
+  <button data-tela="taverna">Taverna</button>
+  <button data-tela="campanha">Campanha</button>
+  <button data-tela="herois">Heróis</button>
+  <button data-tela="invocar">Invocar</button>
+</div></nav>
+
+<script src="logic.js"></script>
+<script>
+(function () {
+  'use strict';
+  const TL = window.TL;
+  const CHAVE = 'taverna-idle-v1';
+  let E = null;
+  try { E = TL.carrega(localStorage.getItem(CHAVE)); } catch (_) {}
+  if (!E) E = TL.novoEstado();
+  const salva = () => { try { localStorage.setItem(CHAVE, TL.serializa(E)); } catch (_) {} };
+  const $ = (s, el = document) => el.querySelector(s);
+  const fmt = (n) => Math.floor(n).toLocaleString('pt-BR');
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let telaAtual = 'taverna', heroiAberto = null, anim = null;
+  const ARTE = { fen: 'assets/fen.webp', brutus: 'assets/brutus.webp', ondina: 'assets/ondina.webp', vex: 'assets/vex.webp', rosa: 'assets/rosa.webp', morgrath: 'assets/morgrath.webp' };
+  ['floresta', 'fortaleza', 'abismo', 'sombra'].forEach((f) => (ARTE['rec-' + f] = 'assets/rec-' + f + '.webp'));
+  Object.entries({ floresta: 'espinhoso', fortaleza: 'golem', abismo: 'lodo', sombra: 'espectro', luz: 'sentinela', trevas: 'cria' }).forEach(([f, n]) => (ARTE['mon-' + f] = 'assets/mon-' + n + '.webp'));
+  const IMG = {}; Object.entries(ARTE).forEach(([k, src]) => { const im = new Image(); im.src = src; IMG[k] = im; });
+  // quadros de ataque gerados no GPT (mesma escala; pe = posição dos pés na largura)
+  const QUADROS = { morgrath: [{"w": 377, "h": 495, "pe": 0.585}, {"w": 432, "h": 496, "pe": 0.503}, {"w": 575, "h": 408, "pe": 0.356}, {"w": 448, "h": 405, "pe": 0.544}].map((m, i) => { const im = new Image(); im.src = 'assets/morgrath-q' + (i + 1) + '.webp'; return { ...m, im }; }) };
+  // imagem de um herói pela definição (campeão ou recruta da facção)
+  function imgDef(def) { const d = TL.DEFS[def]; if (!d) return null; return IMG[def] || (d.recruta ? IMG['rec-' + d.fac] : null); }
+  const FUNDO = new Image(); FUNDO.src = 'assets/cenario-clareira.webp';
+  const pronta = (im) => !!im && im.complete && im.naturalWidth > 0;
+  function quandoPronta(im, fn) { if (pronta(im)) fn(); else im.addEventListener('load', fn, { once: true }); }
+
+  // ---------- Desenho ----------
+  function rr(c, x, y, w, h, r, cor) { c.fillStyle = cor; c.beginPath(); c.roundRect(x, y, w, h, r); c.fill(); }
+  function bola(c, x, y, r, cor) { c.fillStyle = cor; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); }
+  function desenhaHeroi(c, x, y, s, u, t, flip) {
+    const fac = TL.FACCOES[u.fac], fn = u.funcao;
+    const rec = u.recruta || (u.ref && TL.DEFS[u.ref] && TL.DEFS[u.ref].recruta);
+    if (rec) s *= 0.88;
+    c.save(); c.translate(x, y); c.scale(flip ? -s : s, s);
+    const b = Math.sin(t * 3 + x) * 1.5;
+    c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(0, 30, 16, 4, 0, 0, 7); c.fill();
+    c.translate(0, b);
+    rr(c, -7, 18, 5, 11, 2, '#2C2C2A'); rr(c, 2, 18, 5, 11, 2, '#2C2C2A');
+    rr(c, -11, 0, 22, 22, 6, rec ? '#7A5A3A' : fac.cor);
+    rr(c, -11, 8, 22, 3, 1, rec ? fac.cor : fac.claro);
+    bola(c, 0, -12, 15, '#F5C4B3');
+    bola(c, -5, -11, 2, '#2C2C2A'); bola(c, 5, -11, 2, '#2C2C2A');
+    c.lineWidth = 3; c.lineCap = 'round';
+    if (fn === 'guerreiro') { c.fillStyle = fac.cor; c.beginPath(); c.arc(0, -15, 16, Math.PI, 0); c.fill(); rr(c, -2, -34, 4, 8, 2, fac.claro); c.strokeStyle = '#D3D1C7'; c.beginPath(); c.moveTo(12, 12); c.lineTo(27, -9); c.stroke(); }
+    if (fn === 'tanque') { c.fillStyle = '#888780'; c.beginPath(); c.arc(0, -15, 16, Math.PI, 0); c.fill(); rr(c, -4, -18, 8, 6, 2, '#5F5E5A'); rr(c, 9, -2, 14, 22, 5, fac.claro); rr(c, 13, 3, 6, 12, 2, fac.cor); }
+    if (fn === 'mago') { c.fillStyle = fac.cor; c.beginPath(); c.moveTo(-18, -20); c.lineTo(18, -20); c.lineTo(4, -50); c.fill(); c.strokeStyle = '#854F0B'; c.beginPath(); c.moveTo(14, 26); c.lineTo(16, -14); c.stroke(); bola(c, 16, -17, 4, fac.claro); }
+    if (fn === 'arqueiro') { c.fillStyle = fac.cor; c.beginPath(); c.arc(0, -14, 16, Math.PI * 0.9, Math.PI * 2.1); c.fill(); c.strokeStyle = '#854F0B'; c.beginPath(); c.arc(16, 6, 14, -1.2, 1.2); c.stroke(); }
+    if (fn === 'assassino') { rr(c, -15, -16, 30, 6, 3, '#2C2C2A'); c.fillStyle = fac.cor; c.beginPath(); c.arc(0, -16, 16, Math.PI, 0); c.fill(); c.strokeStyle = '#D3D1C7'; c.beginPath(); c.moveTo(12, 14); c.lineTo(22, 4); c.stroke(); }
+    if (fn === 'suporte') { c.strokeStyle = '#FAC775'; c.lineWidth = 2; c.beginPath(); c.ellipse(0, -31, 10, 3, 0, 0, 7); c.stroke(); c.fillStyle = '#FAEEDA'; c.beginPath(); c.arc(0, -14, 16, Math.PI, 0); c.fill(); }
+    c.restore();
+  }
+  function desenhaMonstro(c, x, y, s, u, t, hit) {
+    const fac = TL.FACCOES[u.fac];
+    c.save(); c.translate(x, y); c.scale(s * (u.chefe ? 1.35 : 1), s * (u.chefe ? 1.35 : 1));
+    const q = Math.sin(t * 4 + y) * 2;
+    c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(0, 30, 20, 5, 0, 0, 7); c.fill();
+    c.fillStyle = hit ? '#F4C0D1' : fac.cor; c.beginPath(); c.ellipse(0, 10 + q / 2, 21 + q, 20 - q, 0, 0, 7); c.fill();
+    c.fillStyle = fac.claro; c.beginPath(); c.ellipse(-6, 4, 6, 4, 0, 0, 7); c.fill();
+    bola(c, -8, 6, 6, '#F1EFE8'); bola(c, 8, 6, 7, '#F1EFE8'); bola(c, -9, 7, 3, '#2C2C2A'); bola(c, 7, 7, 3.5, '#2C2C2A');
+    if (u.chefe) { c.fillStyle = '#E0B54A'; c.beginPath(); c.moveTo(-12, -8); c.lineTo(-8, -18); c.lineTo(0, -10); c.lineTo(8, -18); c.lineTo(12, -8); c.fill(); }
+    c.restore();
+  }
+  function retrato(canvas, def, est) {
+    const d = TL.DEFS[def]; const dpr = window.devicePixelRatio || 1;
+    canvas.width = 56 * dpr; canvas.height = 56 * dpr;
+    const c = canvas.getContext('2d'); c.scale(dpr, dpr);
+    const moldura = () => { if (d.rar) { c.strokeStyle = TL.RARIDADES[d.rar].cor; c.lineWidth = 3; c.beginPath(); c.roundRect(1.5, 1.5, 53, 53, 9); c.stroke(); } };
+    if (imgDef(def)) { quandoPronta(imgDef(def), () => { c.clearRect(0, 0, 56, 56); const im = imgDef(def), h = d.recruta ? 44 : 50, w = (h * im.naturalWidth) / im.naturalHeight; c.drawImage(im, 28 - w / 2, 3, w, h); moldura(); }); return; }
+    moldura(); desenhaHeroi(c, 28, 30, 0.72, d, 0, false);
+  }
+  function cena(canvas, W, H) {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    const c = canvas.getContext('2d'); c.scale(dpr, dpr); return c;
+  }
+
+  // ---------- Topo ----------
+  function topo() {
+    $('#topo').innerHTML = [
+      ['var(--ouro)', fmt(E.ouro), 'ouro'], ['#9FE1CB', fmt(E.xp), 'xp'], ['var(--gema)', fmt(E.gemas), 'gemas'],
+      ['#D3D1C7', E.pergC, 'perg. comum'], ['var(--brasa)', E.pergP, 'perg. premium'],
+    ].map(([c, v, n]) => `<span class="rec" title="${n}"><i style="background:${c}"></i>${v} <span class="suave peq">${n}</span></span>`).join('');
+  }
+
+  // ---------- Taverna ----------
+  function telaTaverna() {
+    const p = TL.afkPendente(E);
+    const h = Math.floor(p.min / 60), m = Math.floor(p.min % 60);
+    const tx = TL.taxaAfk(E);
+    $('#tela').innerHTML = `
+      <canvas id="cTav" aria-label="A taverna com sua equipe"></canvas>
+      <div class="cartao">
+        <div class="linha entre"><h2>Ganhos enquanto você estava fora</h2><span class="suave peq">${h}h ${String(m).padStart(2, '0')}min / 12h</span></div>
+        <div class="barra"><div style="width:${(100 * p.min / TL.AFK_MAX_MIN).toFixed(1)}%"></div></div>
+        <div class="grade2">
+          <div class="stat"><span class="suave peq">Ouro</span><b>${fmt(p.ouro)}</b></div>
+          <div class="stat"><span class="suave peq">Experiência</span><b>${fmt(p.xp)}</b></div>
+        </div>
+        <p class="suave peq" style="margin:0">Rendimento atual: ${fmt(tx.ouro * 60)} ouro e ${fmt(tx.xp * 60)} xp por hora. Aumenta conforme você avança na campanha. ${p.cheio ? '<b class="ok">Baú cheio: colete para não perder ganhos.</b>' : ''}</p>
+        <button class="b prim" id="bColeta">Coletar</button>
+      </div>
+      <div class="cartao">
+        <h3>Ferramentas do protótipo</h3>
+        <div class="linha">
+          <button class="b" id="bTempo">Avançar 2h</button>
+          <button class="b" id="bGemas">+2.000 gemas</button>
+          <button class="b" id="bReset">Recomeçar</button>
+          <button class="b" id="bLab">Teste de animação</button>
+          <button class="b" id="bMorg">Pôr Morgrath na equipe</button>
+        </div>
+        <p class="aviso" id="avTav"></p>
+      </div>`;
+    const W = 360, H = 230, c = cena($('#cTav'), W, H);
+    const eq = E.equipe.map((u) => TL.heroi(E, u)).filter(Boolean);
+    let confirmaReset = false;
+    function desenha(t) {
+      rr(c, 0, 0, W, H, 0, '#3a2412');
+      for (let i = 0; i < 6; i++) rr(c, 0, i * 26, W, 2, 0, '#2a190b');
+      rr(c, 0, 150, W, 80, 0, '#5a3613');
+      for (let i = 0; i < 9; i++) rr(c, i * 42, 150, 2, 80, 0, '#3a2412');
+      rr(c, 18, 40, 64, 52, 4, '#1b1840'); rr(c, 49, 40, 3, 52, 0, '#2a190b'); rr(c, 18, 64, 64, 3, 0, '#2a190b');
+      c.strokeStyle = '#AFA9EC'; c.lineWidth = 2; c.beginPath(); c.moveTo(58, 44); c.lineTo(64, 54); c.lineTo(60, 62); c.stroke();
+      rr(c, 120, 14, 120, 34, 6, '#2a190b'); c.fillStyle = '#FAC775'; c.font = '600 12px "Alegreya SC", serif'; c.textAlign = 'center'; c.fillText('A Taverna do Fim do Mundo', 180, 36);
+      const f = Math.sin(t * 8) * 3; rr(c, 280, 70, 60, 50, 4, '#444441'); bola(c, 310, 100 - f / 2, 10 + f / 3, '#EF9F27'); bola(c, 310, 104, 6, '#FAC775');
+      eq.forEach((h, i) => { const d = TL.DEFS[h.def]; desenhaHeroi(c, 40 + i * 56, 182, 0.72, d, t, false); });
+    }
+    pararAnim(); const t0 = performance.now();
+    (function loop(n) { desenha((n - t0) / 1000); anim = requestAnimationFrame(loop); })(t0);
+    $('#bColeta').onclick = () => { const g = TL.coletaAfk(E); salva(); render(); aviso('#avTav', `Coletado: ${fmt(g.ouro)} ouro e ${fmt(g.xp)} xp.`, true); };
+    $('#bTempo').onclick = () => { E.ultimoAfk -= 2 * 3600e3; salva(); render(); };
+    $('#bLab').onclick = () => abreLaboratorio();
+    $('#bMorg').onclick = () => {
+      let m = E.herois.find((h) => h.def === 'morgrath');
+      if (!m) m = TL.criaHeroi(E, 'morgrath', 5);
+      if (!E.equipe.includes(m.uid)) {
+        if (E.equipe.length >= 6) {
+          const fraco = [...E.equipe].sort((a, b) => TL.poder(TL.heroi(E, a)) - TL.poder(TL.heroi(E, b)))[0];
+          E.equipe = E.equipe.filter((u) => u !== fraco);
+        }
+        E.equipe.push(m.uid);
+      }
+      salva(); render(); aviso('#avTav', 'Morgrath está na sua equipe. Vá em Campanha e lute.', true);
+    };
+    $('#bGemas').onclick = () => { E.gemas += 2000; salva(); render(); };
+    $('#bReset').onclick = () => {
+      if (!confirmaReset) { confirmaReset = true; $('#bReset').textContent = 'Toque de novo para apagar tudo'; return; }
+      E = TL.novoEstado(); salva(); render();
+    };
+  }
+  function aviso(sel, txt, bom) { const a = $(sel); if (a) { a.textContent = txt; a.className = 'aviso' + (bom ? ' ok' : ''); } }
+
+  // ---------- Campanha ----------
+  function chipFac(fac) { const f = TL.FACCOES[fac]; return `<span class="chip" style="color:${f.claro}">${f.nome}</span>`; }
+  function telaCampanha() {
+    const n = Math.min(E.fase + 1, TL.TOTAL_FASES);
+    const fim = E.fase >= TL.TOTAL_FASES;
+    const info = TL.infoFase(n), ini = TL.inimigosDaFase(n), rec = TL.recompensaFase(n);
+    const facsEq = new Set(E.equipe.map((u) => TL.DEFS[TL.heroi(E, u).def].fac));
+    const poderEq = E.equipe.reduce((a, u) => a + TL.poder(TL.heroi(E, u)), 0);
+    const dicas = [...new Set(ini.map((m) => m.fac))].map((fac) => {
+      const quem = Object.keys(TL.VENCE).find((k) => TL.VENCE[k] === fac);
+      return `${chipFac(fac)} perde para ${TL.FACCOES[quem].nome}${facsEq.has(quem) ? ' <span class="ok">(você tem)</span>' : ''}`;
+    });
+    $('#tela').innerHTML = `
+      <div class="cartao">
+        <div class="linha entre"><h2>${fim ? 'Campanha concluída' : info.nome}${info.chefe && !fim ? ' · Chefe' : ''}</h2><span class="suave peq">${E.fase}/${TL.TOTAL_FASES}</span></div>
+        <canvas id="cPrev" aria-label="Prévia da batalha"></canvas>
+        <div class="linha entre">
+          <span class="suave peq">Poder da equipe: <b style="color:var(--texto)">${fmt(poderEq)}</b></span>
+          <button class="b prim" id="bLutar">${fim ? 'Repetir fase 30' : 'Lutar'}</button>
+        </div>
+      </div>
+      <div class="cartao">
+        <h3>Inimigos</h3>
+        <div class="lista peq">${dicas.map((d) => '<div>' + d + '</div>').join('')}</div>
+        <p class="suave peq" style="margin:0">Vantagem de facção: +30% de dano. Ciclo: Floresta vence Abismo, Abismo vence Fortaleza, Fortaleza vence Sombra, Sombra vence Floresta. Luz e Trevas vencem uma à outra.</p>
+        ${fim ? '' : `<p class="peq" style="margin:0">Primeira vitória: ${fmt(rec.ouro)} ouro, ${fmt(rec.xp)} xp, ${rec.gemas} gemas${rec.pergC ? ', ' + rec.pergC + ' perg. comuns' : ''}${rec.pergP ? ', 1 perg. premium' : ''}.</p>`}
+      </div>`;
+    const c = cena($('#cPrev'), AW, AH);
+    const lado = TL.montaLado(E);
+    const A = lado.map((u, i) => ({ ...u, id: 'a' + i, hpMax: u.hpMax })), B = ini.map((m, i) => ({ ...m, id: 'b' + i, hpMax: m.hp, monstro: true }));
+    const arena = criaArena(A, B, false);
+    pararAnim(); let ult = performance.now();
+    (function loop(t) { const dt = Math.min(0.05, (t - ult) / 1000); ult = t; arena.desenha(c, dt); anim = requestAnimationFrame(loop); })(ult);
+    $('#bLutar').onclick = () => {
+      const res = TL.lutarFase(E, fim ? TL.TOTAL_FASES : n);
+      salva(); topo();
+      abreBatalha(res);
+    };
+  }
+
+  // ---------- Animação de ataque corpo a corpo (só a lógica do movimento) ----------
+  // Ajustes: velocidade (1 = 1 segundo), distância do avanço (1 = até o alvo) e intensidade do golpe.
+  const CFG_ATAQUE = { velocidade: 1, distancia: 1, intensidade: 1, modo: 'quadros' }; // modo: 'codigo' ou 'quadros'
+  const FASES = { prep: 0.2, avanco: 0.42, golpe: 0.6 }; // frações da duração; o resto é o retorno
+  const MOMENTO_IMPACTO = 0.5;
+  const suave = (k) => k * k * (3 - 2 * k), entra = (k) => k * k * k, sai = (k) => 1 - Math.pow(1 - k, 3);
+  // p: progresso 0..1; alcance: pixels até a posição de golpe. Devolve deslocamento "para a frente", giro e escala.
+  function poseAtaque(p, alcance, cfg) {
+    const I = cfg.intensidade, recuo = 12;
+    if (p < FASES.prep) { const k = suave(p / FASES.prep); return { dx: -recuo * k, rot: -0.14 * I * k, esc: 1 }; }
+    if (p < FASES.avanco) { const k = entra((p - FASES.prep) / (FASES.avanco - FASES.prep)); return { dx: -recuo + (alcance + recuo) * k, rot: -0.14 * I + 0.1 * I * k, esc: 1 + 0.04 * k }; }
+    if (p < FASES.golpe) { const k = sai((p - FASES.avanco) / (FASES.golpe - FASES.avanco)); return { dx: alcance, rot: -0.04 * I + 0.5 * I * k, esc: 1.04 + 0.04 * I * Math.sin(k * Math.PI) }; }
+    const k = suave((p - FASES.golpe) / (1 - FASES.golpe));
+    return { dx: alcance * (1 - k), rot: 0.46 * I * (1 - k), esc: 1 + 0.04 * (1 - k) };
+  }
+
+  // ---------- Efeitos visuais (separados da animação) ----------
+  const COR_GOLPE = { trevas: ['#FF4A3D', '#2B0707'] };
+  function criaEfeitos() {
+    const lista = [];
+    return {
+      golpe(x, y, dir, fac, I) {
+        const [cor, escura] = COR_GOLPE[fac] || [TL.FACCOES[fac].claro, TL.FACCOES[fac].cor];
+        lista.push({ tipo: 'arco', x, y, dir, cor, l: 0.32, max: 0.32, I });
+        const n = Math.round(14 * I);
+        for (let i = 0; i < n; i++) {
+          lista.push({ tipo: 'chama', x: x + (Math.random() - 0.3) * 30 * dir, y: y + (Math.random() - 0.5) * 50,
+            vx: dir * (30 + Math.random() * 90), vy: -40 - Math.random() * 90, r: 3 + Math.random() * 5 * I,
+            cor: Math.random() < 0.55 ? cor : escura, l: 0.45 + Math.random() * 0.35, max: 0.8 });
+        }
+      },
+      desenha(c, dt) {
+        for (let i = lista.length - 1; i >= 0; i--) {
+          const e = lista[i]; e.l -= dt; if (e.l <= 0) { lista.splice(i, 1); continue; }
+          if (e.tipo === 'arco') {
+            const k = 1 - e.l / e.max, raio = (46 + 26 * k) * e.I;
+            const a0 = e.dir > 0 ? -1.3 : Math.PI + 1.3, a1 = e.dir > 0 ? -1.3 + 2.3 * Math.min(1, k * 2.2) : Math.PI + 1.3 - 2.3 * Math.min(1, k * 2.2);
+            c.save(); c.globalCompositeOperation = 'lighter'; c.lineCap = 'round';
+            c.globalAlpha = e.l / e.max; c.strokeStyle = e.cor; c.lineWidth = 12 * e.I;
+            c.beginPath(); c.arc(e.x - e.dir * 20, e.y, raio, a0, a1, e.dir < 0); c.stroke();
+            c.globalAlpha = (e.l / e.max) * 0.9; c.strokeStyle = '#FFE2D6'; c.lineWidth = 3 * e.I;
+            c.beginPath(); c.arc(e.x - e.dir * 20, e.y, raio, a0, a1, e.dir < 0); c.stroke(); c.restore();
+          } else {
+            e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 60 * dt;
+            c.globalAlpha = Math.min(1, e.l / 0.3); bola(c, e.x, e.y, e.r * (0.5 + e.l), e.cor); c.globalAlpha = 1;
+          }
+        }
+      },
+    };
+  }
+
+  // ---------- Arena (paisagem 16:9) ----------
+  const AW = 640, AH = 360;
+  const POS = [[238, 250], [254, 322], [154, 234], [170, 302], [74, 260], [90, 330]];
+  const CORPO_A_CORPO = { guerreiro: 1, tanque: 1, assassino: 1 };
+  function posBase(id) { const p = POS[Math.min(+id.slice(1), 5)]; return id[0] === 'a' ? [p[0], p[1]] : [AW - p[0], p[1]]; }
+  function escalaProf(y) { return 0.9 + ((y - 230) / 100) * 0.18; }
+
+  function criaArena(listaA, listaB, real) {
+    const uni = {};
+    [...listaA, ...listaB].forEach((u) => {
+      const [x, y] = posBase(u.id);
+      uni[u.id] = { ...u, x, y, hp: u.hpMax, en: 0, hit: 0, morto: 0, acao: null, brilho: 0, fase: Math.random() * 6 };
+    });
+    const nums = [], proj = [], brilhos = [], fx = criaEfeitos();
+    let relogio = 0, tremor = 0, banner = null, vez = null;
+    const st = { uni, nums, proj, rodada: 0 };
+
+    function desenhaUnidade(c, u) {
+      const s = escalaProf(u.y);
+      let dx = 0, dy = 0, rot = 0, esc = 1;
+      const dir = u.id[0] === 'a' ? 1 : -1;
+      if (u.acao) {
+        const p = Math.min(1, u.acao.t / u.acao.dur);
+        if (u.acao.melee && u.acao.alvo) {
+          const alcance = Math.max(0, Math.abs(u.acao.alvo.x - u.x) - 70) * CFG_ATAQUE.distancia;
+          const pose = poseAtaque(p, alcance, CFG_ATAQUE);
+          dx = dir * pose.dx; dy = alcance ? (u.acao.alvo.y - u.y) * (pose.dx / alcance) * 0.8 : 0;
+          rot = pose.rot; esc = pose.esc;
+        } else {
+          dx = -dir * 8 * Math.sin(Math.min(1, p * 3) * Math.PI);
+        }
+      }
+      if (u.hit > 0) dx += (Math.random() - 0.5) * 6 * (u.tremor || 1);
+      const x = u.x + dx, y = u.y + dy;
+      const resp = Math.sin(relogio * 2.4 + u.fase);
+      c.save();
+      c.globalAlpha = u.morto ? Math.max(0, 1 - u.morto * 2) : 1;
+      c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(x, y, 30 * s, 8 * s, 0, 0, 7); c.fill();
+      if (u.brilho > 0) {
+        c.strokeStyle = TL.FACCOES[u.fac].claro; c.lineWidth = 3; c.globalAlpha *= Math.min(1, u.brilho);
+        c.beginPath(); c.ellipse(x, y, 40 * s * (1.4 - u.brilho * 0.4), 12 * s * (1.4 - u.brilho * 0.4), 0, 0, 7); c.stroke();
+        c.globalAlpha = u.morto ? Math.max(0, 1 - u.morto * 2) : 1;
+      }
+      if (u.hit > 0) c.filter = 'brightness(2.1)';
+      const queda = u.morto ? u.morto * 30 : 0;
+      const img = u.monstro ? IMG['mon-' + u.fac] : imgDef(u.ref);
+      const altura = u.monstro ? (u.chefe ? 125 : 92) : TL.DEFS[u.ref] && TL.DEFS[u.ref].recruta ? 88 : 108;
+      // quadro de ataque do GPT, quando o modo "quadros" estiver ligado e o herói tiver quadros
+      let quadro = null;
+      if (CFG_ATAQUE.modo === 'quadros' && u.acao && u.acao.melee && QUADROS[u.ref]) {
+        const p = u.acao.t / u.acao.dur, q = QUADROS[u.ref];
+        const iq = p < FASES.prep ? 0 : p < FASES.avanco ? 1 : p < FASES.golpe ? 2 : p < 0.78 ? 3 : -1;
+        if (iq >= 0 && pronta(q[iq].im)) quadro = q[iq];
+      }
+      let topo;
+      if (quadro) {
+        const h = altura * s * (quadro.h / 440), w = (h * quadro.w) / quadro.h;
+        c.translate(x, y + queda); if (dir < 0) c.scale(-1, 1);
+        c.drawImage(quadro.im, -w * quadro.pe, -h, w, h);
+        topo = y - altura * s;
+      } else if (img && pronta(img)) {
+        const h = altura * s * (1 + resp * 0.012), w = (h * img.naturalWidth) / img.naturalHeight;
+        c.translate(x, y + queda); if (dir < 0 && !u.monstro) c.scale(-1, 1);
+        if (u.monstro && u.hp > 0) c.translate(0, Math.sin(relogio * 3 + u.fase) * 2);
+        if ((rot || esc !== 1) && CFG_ATAQUE.modo !== 'quadros') { c.translate(0, -h * 0.35); c.rotate(rot * (dir < 0 && u.monstro ? -1 : 1)); c.scale(esc, esc); c.translate(0, h * 0.35); }
+        c.drawImage(img, -w / 2, -h, w, h);
+        topo = y - h;
+      } else if (u.monstro) {
+        const k = 1.55 * s; desenhaMonstro(c, x, y - 30 * k + queda, k, u, relogio, u.hit > 0);
+        topo = y - (u.chefe ? 80 : 62) * s;
+      } else {
+        const k = 1.45 * s; desenhaHeroi(c, x, y - 30 * k + queda, k, u, relogio, dir < 0);
+        topo = y - 78 * s;
+      }
+      c.restore();
+      if (u.hp > 0 || u.morto < 0.5) {
+        const bw = 52 * s, by = topo - 12;
+        rr(c, x - bw / 2, by, bw, 6, 3, 'rgba(20,16,10,.85)');
+        rr(c, x - bw / 2 + 1, by + 1, (bw - 2) * Math.max(0, u.hp) / u.hpMax, 4, 2, u.id[0] === 'a' ? '#7FCB8F' : '#EE8A7E');
+        rr(c, x - bw / 2, by + 7, bw, 4, 2, 'rgba(20,16,10,.85)');
+        rr(c, x - bw / 2 + 1, by + 8, (bw - 2) * Math.min(100, u.en) / 100, 2, 1, u.en >= 100 ? '#FAC775' : '#E0B54A');
+      }
+    }
+
+    function desenhaProj(c, p) {
+      const k = Math.max(0, Math.min(1, p.t / p.dur));
+      const x0 = p.de.x + (p.de.id[0] === 'a' ? 30 : -30), y0 = p.de.y - 60, x1 = p.para.x, y1 = p.para.y - 50;
+      const x = x0 + (x1 - x0) * k, y = y0 + (y1 - y0) * k - Math.sin(k * Math.PI) * (p.tipo === 'arqueiro' ? 30 : 10);
+      const cor = TL.FACCOES[p.fac].claro;
+      if (p.tipo === 'arqueiro') {
+        const ang = Math.atan2(y1 - y0 - Math.cos(k * Math.PI) * 30 * Math.PI, x1 - x0);
+        c.save(); c.translate(x, y); c.rotate(ang); c.strokeStyle = '#EFE7D6'; c.lineWidth = 2.5;
+        c.beginPath(); c.moveTo(-16, 0); c.lineTo(10, 0); c.stroke(); c.fillStyle = '#D3D1C7'; c.beginPath(); c.moveTo(14, 0); c.lineTo(7, -4); c.lineTo(7, 4); c.fill(); c.restore();
+      } else {
+        c.save(); c.globalAlpha = 0.35; bola(c, x, y, 13, cor); c.globalAlpha = 1; bola(c, x, y, 6, cor); bola(c, x - 2, y - 2, 2.5, '#FFFFFF'); c.restore();
+      }
+    }
+
+    function golpeia(g, rapido) {
+      const u = uni[g.alvo]; u.hp = Math.max(0, u.hp - g.dano); u.en = Math.min(100, u.en + 10);
+      if (!rapido) {
+        u.hit = 0.18;
+        nums.push({ x: u.x + (Math.random() - 0.5) * 16, y: u.y - 105, txt: (g.crit ? 'Crítico ' : '') + fmt(g.dano), cor: g.vant ? '#FAC775' : '#FFFFFF', l: 1, g: g.crit });
+      }
+    }
+    function cura(g, rapido) {
+      const u = uni[g.alvo]; u.hp = Math.min(u.hpMax, u.hp + g.cura);
+      if (!rapido) {
+        nums.push({ x: u.x, y: u.y - 105, txt: '+' + fmt(g.cura), cor: '#7FCB8F', l: 1 });
+        for (let i = 0; i < 6; i++) brilhos.push({ x: u.x + (Math.random() - 0.5) * 40, y: u.y - Math.random() * 60, l: 0.8 + Math.random() * 0.4 });
+      }
+    }
+    // aplica um evento; devolve quanto tempo ele ocupa
+    function aplica(ev, rapido) {
+      if (ev.t === 'rodada') { st.rodada = ev.n; return 0.05; }
+      if (ev.t === 'lado') { if (!rapido) vez = { txt: ev.lado === 0 ? 'Sua equipe ataca' : 'Vez dos inimigos', cor: ev.lado === 0 ? '#7FCB8F' : '#EE8A7E', l: 0.9 }; return rapido ? 0 : 0.45; }
+      const a = uni[ev.de];
+      if (ev.hab) { a.en = 0; } else a.en = Math.min(100, a.en + 50);
+      if (rapido) { ev.golpes.forEach((g) => golpeia(g, true)); ev.curas.forEach((g) => cura(g, true)); return 0; }
+      const alvo = ev.golpes.length ? uni[ev.golpes[0].alvo] : null;
+      const melee = !!CORPO_A_CORPO[a.funcao] && !!alvo && ev.golpes.length === 1;
+      const dur = melee ? (ev.hab ? 1.15 : 1) / CFG_ATAQUE.velocidade : ev.hab ? 1.05 : 0.72;
+      a.acao = { t: 0, dur, melee, alvo };
+      if (ev.hab) { a.brilho = 1; banner = { txt: a.nome + ' · ' + ev.nomeHab, l: 1.3 }; tremor = ev.golpes.length > 1 ? 0.35 : 0.18; }
+      const impacto = melee ? dur * MOMENTO_IMPACTO : 0.42;
+      if (melee) pend.push({ em: relogio + impacto, fn: () => { const dirA = a.id[0] === 'a' ? 1 : -1; fx.golpe(alvo.x - dirA * 10, alvo.y - 55, dirA, a.fac, CFG_ATAQUE.intensidade * (ev.hab ? 1.3 : 1)); alvo.tremor = 1 + CFG_ATAQUE.intensidade; } });
+      if (!melee) ev.golpes.forEach((g, k) => proj.push({ de: a, para: uni[g.alvo], t: -k * 0.09, dur: 0.38, tipo: a.funcao === 'arqueiro' ? 'arqueiro' : 'magia', fac: a.fac }));
+      ev.golpes.forEach((g, k) => pend.push({ em: relogio + impacto + (melee ? 0 : k * 0.09), fn: () => golpeia(g, false) }));
+      ev.curas.forEach((g) => pend.push({ em: relogio + 0.45, fn: () => cura(g, false) }));
+      return melee ? dur * 0.85 : dur;
+    }
+    const pend = [];
+
+    function desenha(c, dt) {
+      relogio += dt;
+      for (let i = pend.length - 1; i >= 0; i--) if (pend[i].em <= relogio) { pend[i].fn(); pend.splice(i, 1); }
+      Object.values(uni).forEach((u) => {
+        if (u.acao) { u.acao.t += dt; if (u.acao.t >= u.acao.dur) u.acao = null; }
+        u.hit = Math.max(0, u.hit - dt); if (u.hit <= 0) u.tremor = 0; u.brilho = Math.max(0, u.brilho - dt * 1.2);
+        if (u.hp <= 0 && u.hit <= 0) u.morto = Math.min(1, u.morto + dt);
+      });
+      c.save();
+      if (tremor > 0) { tremor -= dt; c.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 4); }
+      if (pronta(FUNDO)) c.drawImage(FUNDO, 0, 0, AW, AH); else rr(c, 0, 0, AW, AH, 0, '#2a4a24');
+      Object.values(uni).sort((a, b) => a.y - b.y).forEach((u) => { if (u.morto < 1) desenhaUnidade(c, u); });
+      for (let i = proj.length - 1; i >= 0; i--) { const p = proj[i]; p.t += dt; if (p.t >= p.dur) proj.splice(i, 1); else if (p.t > 0) desenhaProj(c, p); }
+      fx.desenha(c, dt);
+      for (let i = brilhos.length - 1; i >= 0; i--) { const b = brilhos[i]; b.l -= dt; b.y -= dt * 40; if (b.l <= 0) brilhos.splice(i, 1); else { c.globalAlpha = Math.min(1, b.l); bola(c, b.x, b.y, 3, '#FAC775'); c.globalAlpha = 1; } }
+      for (let i = nums.length - 1; i >= 0; i--) {
+        const f = nums[i]; f.l -= dt; f.y -= dt * 34; if (f.l <= 0) { nums.splice(i, 1); continue; }
+        c.globalAlpha = Math.min(1, f.l * 1.6); c.font = (f.g ? '700 19px' : '700 16px') + ' "Work Sans", sans-serif'; c.textAlign = 'center';
+        c.lineWidth = 4; c.strokeStyle = 'rgba(20,12,6,.9)'; c.strokeText(f.txt, f.x, f.y); c.fillStyle = f.cor; c.fillText(f.txt, f.x, f.y); c.globalAlpha = 1;
+      }
+      if (real) {
+        rr(c, 10, 10, 98, 24, 8, 'rgba(16,13,9,.7)'); c.fillStyle = '#EFE7D6'; c.font = '600 13px "Work Sans", sans-serif'; c.textAlign = 'left'; c.fillText('Turno ' + st.rodada + '/15', 20, 27);
+      }
+      if (vez && vez.l > 0) {
+        vez.l -= dt; c.globalAlpha = Math.min(1, vez.l * 3);
+        c.font = '700 22px "Alegreya SC", Georgia, serif'; c.textAlign = 'center'; c.lineWidth = 5; c.strokeStyle = 'rgba(16,13,9,.9)';
+        c.strokeText(vez.txt, AW / 2, 120); c.fillStyle = vez.cor; c.fillText(vez.txt, AW / 2, 120); c.globalAlpha = 1;
+      }
+      if (banner && banner.l > 0) {
+        banner.l -= dt; c.globalAlpha = Math.min(1, banner.l * 2.5);
+        rr(c, AW / 2 - 170, 56, 340, 36, 10, 'rgba(16,13,9,.82)'); c.fillStyle = '#FAC775'; c.font = '700 17px "Alegreya SC", Georgia, serif'; c.textAlign = 'center'; c.fillText(banner.txt, AW / 2, 80); c.globalAlpha = 1;
+      }
+      c.restore();
+    }
+    return { desenha, aplica, uni, ocupado: () => pend.length > 0 || proj.length > 0 };
+  }
+
+  function abreBatalha(res) {
+    pararAnim();
+    const div = document.createElement('div');
+    div.className = 'arena';
+    div.innerHTML = `<div class="palco"><canvas id="cArena" aria-label="Batalha"></canvas><div id="faixa"></div>
+      <div class="arenaBotoes"><button class="b" id="bVel">2x</button><button class="b" id="bPular">Pular</button></div></div>
+      <p class="gire">Gire o celular para jogar deitado.</p>`;
+    document.body.appendChild(div);
+    const cv = $('#cArena');
+    function ajusta() {
+      const pad = 8, w = Math.min(innerWidth - pad * 2, ((innerHeight - pad * 2) * AW) / AH);
+      cv.style.width = w + 'px'; cv.style.height = (w * AH) / AW + 'px';
+      $('.palco', div).style.width = w + 'px';
+    }
+    ajusta(); addEventListener('resize', ajusta);
+    const c = cena(cv, AW, AH);
+    const arena = criaArena(res.A, res.B, true);
+    let vel = 1, idx = 0, espera = 0.6, acabou = false, agendado = false;
+    $('#bVel').onclick = () => { vel = vel === 1 ? 2 : 1; $('#bVel').textContent = vel === 1 ? '2x' : '1x'; };
+    $('#bPular').onclick = () => { while (idx < res.eventos.length) arena.aplica(res.eventos[idx++], true); fim(); };
+    function fim() {
+      if (acabou) return; acabou = true;
+      $('.arenaBotoes', div).hidden = true;
+      const r = res.rec;
+      $('#faixa').innerHTML = `<div class="faixa"><h2 style="color:${res.venceu ? 'var(--ouro)' : 'var(--ruim)'}">${res.venceu ? 'Vitória' : 'Derrota'}</h2>
+        <div class="peq">${res.venceu ? (r ? `+${fmt(r.ouro)} ouro · +${fmt(r.xp)} xp · +${r.gemas} gemas${r.pergC ? ' · +' + r.pergC + ' perg. comuns' : ''}${r.pergP ? ' · +1 perg. premium' : ''}` : 'Fase já vencida antes: sem recompensa.') : 'Suba o nível dos heróis, evolua ou use a vantagem de facção.'}</div>
+        <button class="b prim" id="bCont">${res.venceu ? 'Continuar' : 'Voltar'}</button></div>`;
+      $('#bCont').onclick = () => { pararAnim(); removeEventListener('resize', ajusta); div.remove(); render(); };
+    }
+    let ult = performance.now();
+    (function loop(t) {
+      const dt = Math.min(0.05, (t - ult) / 1000) * vel; ult = t;
+      if (!acabou && !agendado) {
+        espera -= dt;
+        while (espera <= 0 && idx < res.eventos.length) espera += arena.aplica(res.eventos[idx++], false);
+        if (idx >= res.eventos.length && espera <= 0 && !arena.ocupado()) { agendado = true; setTimeout(fim, 500 / vel); }
+      }
+      arena.desenha(c, dt);
+      anim = requestAnimationFrame(loop);
+    })(ult);
+  }
+  // ---------- Laboratório de animação ----------
+  function abreLaboratorio() {
+    pararAnim();
+    const div = document.createElement('div');
+    div.className = 'arena';
+    div.innerHTML = `<div class="palco"><canvas id="cLab" aria-label="Teste de animação"></canvas></div>
+      <div class="labCtrl">
+        <label for="lVel">Velocidade <input id="lVel" type="range" min="0.5" max="2" step="0.1" value="${CFG_ATAQUE.velocidade}"></label>
+        <label for="lDist">Avanço <input id="lDist" type="range" min="0.3" max="1.2" step="0.05" value="${CFG_ATAQUE.distancia}"></label>
+        <label for="lInt">Intensidade <input id="lInt" type="range" min="0.3" max="2" step="0.1" value="${CFG_ATAQUE.intensidade}"></label>
+        <label for="lModo">Modo <select id="lModo"><option value="codigo">Imagem + código</option><option value="quadros">Quadros do GPT</option></select></label>
+        <button class="b prim" id="bAtacar">Atacar</button><button class="b" id="bSair">Sair</button>
+      </div>`;
+    document.body.appendChild(div);
+    const cv = $('#cLab');
+    function ajusta() {
+      const w = Math.min(innerWidth - 16, ((innerHeight - 96) * AW) / AH);
+      cv.style.width = w + 'px'; cv.style.height = (w * AH) / AW + 'px';
+    }
+    ajusta(); addEventListener('resize', ajusta);
+    const c = cena(cv, AW, AH);
+    const heroi = { id: 'a0', nome: 'Morgrath', fac: 'trevas', funcao: 'guerreiro', hpMax: 99999, ref: 'morgrath' };
+    const boneco = { id: 'b0', nome: 'Boneco de treino', fac: 'floresta', funcao: 'tanque', hpMax: 99999, monstro: true };
+    const arena = criaArena([heroi], [boneco], false);
+    [['lVel', 'velocidade'], ['lDist', 'distancia'], ['lInt', 'intensidade']].forEach(([id, k]) => ($('#' + id).oninput = (e) => (CFG_ATAQUE[k] = +e.target.value)));
+    $('#lModo').value = CFG_ATAQUE.modo; $('#lModo').onchange = (e) => (CFG_ATAQUE.modo = e.target.value);
+    $('#bAtacar').onclick = () => {
+      const dano = Math.round(800 + Math.random() * 400 * CFG_ATAQUE.intensidade);
+      arena.aplica({ t: 'acao', de: 'a0', hab: false, golpes: [{ alvo: 'b0', dano, crit: Math.random() < 0.2, vant: false }], curas: [] }, false);
+    };
+    $('#bSair').onclick = () => { pararAnim(); removeEventListener('resize', ajusta); div.remove(); render(); };
+    let ult = performance.now();
+    (function loop(t) { const dt = Math.min(0.05, (t - ult) / 1000); ult = t; arena.desenha(c, dt); anim = requestAnimationFrame(loop); })(ult);
+  }
+  function pararAnim() { if (anim) cancelAnimationFrame(anim); anim = null; }
+
+  // ---------- Heróis ----------
+  const estrelas = (n) => '★'.repeat(n);
+  function linhaHeroi(h) {
+    const d = TL.DEFS[h.def], f = TL.FACCOES[d.fac];
+    const rar = d.rar ? `<span class="chip" style="color:${TL.RARIDADES[d.rar].cor === '#185FA5' ? '#85B7EB' : TL.RARIDADES[d.rar].cor === '#534AB7' ? '#AFA9EC' : TL.RARIDADES[d.rar].cor === '#BA7517' ? '#FAC775' : '#F09595'}">${TL.RARIDADES[d.rar].nome}</span>` : '';
+    return `<button class="heroi" data-uid="${h.uid}"><canvas data-def="${h.def}"></canvas>
+      <div style="min-width:0"><div class="linha"><span class="nome">${esc(d.nome)}</span>${rar}</div>
+      <div class="linha peq suave"><span style="color:${f.claro}">${f.nome}</span> · ${TL.FUNCOES[d.funcao].nome} · nv ${h.nv}</div>
+      <div class="estrelas">${estrelas(h.est)}</div></div>
+      <div style="text-align:right"><div class="peq suave">poder</div><b>${fmt(TL.poder(h))}</b>${E.equipe.includes(h.uid) ? '<div class="peq ok">na equipe</div>' : ''}</div></button>`;
+  }
+  function telaHerois() {
+    if (heroiAberto && TL.heroi(E, heroiAberto)) return detalheHeroi(TL.heroi(E, heroiAberto));
+    const hs = [...E.herois].sort((a, b) => (E.equipe.includes(b.uid) - E.equipe.includes(a.uid)) || TL.poder(b) - TL.poder(a));
+    const basicos = E.herois.filter((h) => h.est <= 2).length;
+    $('#tela').innerHTML = `
+      <div class="linha entre"><h2>Heróis (${E.herois.length})</h2><div class="linha"><button class="b" id="bAuto">Melhor equipe</button>${basicos ? `<button class="b" id="bFundir">Fundir 1★ e 2★</button>` : ''}</div></div>
+      <p class="aviso" id="avH"></p>
+      <div class="lista">${hs.map(linhaHeroi).join('')}</div>`;
+    document.querySelectorAll('.heroi canvas').forEach((cv) => retrato(cv, cv.dataset.def));
+    document.querySelectorAll('.heroi').forEach((b) => (b.onclick = () => { heroiAberto = +b.dataset.uid; render(); }));
+    $('#bAuto').onclick = () => { TL.autoEquipe(E, false); salva(); render(); aviso('#avH', 'Equipe montada com os 6 mais fortes.', true); };
+    if ($('#bFundir')) $('#bFundir').onclick = () => { const n = TL.fundirBasicos(E); salva(); render(); aviso('#avH', n ? n + ' fusões feitas.' : 'Nenhum par igual para fundir.', !!n); };
+  }
+  function detalheHeroi(h) {
+    const d = TL.DEFS[h.def], f = TL.FACCOES[d.fac], fn = TL.FUNCOES[d.funcao], a = TL.atributos(h);
+    const sub = TL.podeSubir(E, h), plano = TL.planoFusao(E, h.uid), naEq = E.equipe.includes(h.uid);
+    const custo = TL.custoNivel(h.nv);
+    const max = TL.ESTRELA_MAX[d.origem];
+    $('#tela').innerHTML = `
+      <button class="b" id="bVolta" style="align-self:flex-start">Voltar</button>
+      <div class="cartao">
+        <div class="linha"><canvas id="cRet" style="width:96px;height:96px;background:var(--painel2)"></canvas>
+          <div style="min-width:0"><h1>${esc(d.nome)}</h1>
+          <div class="estrelas" style="font-size:16px">${estrelas(h.est)}<span class="suave peq"> máx. ${max}★</span></div>
+          <div class="linha peq"><span style="color:${f.claro}">${f.nome}${f.rara ? ' (rara)' : ''}</span> · ${fn.nome}${d.rar ? ' · ' + TL.RARIDADES[d.rar].nome : ' · material de fusão'}</div></div></div>
+        <div class="grade2">
+          <div class="stat"><span class="suave peq">Vida</span><b>${fmt(a.hp)}</b></div>
+          <div class="stat"><span class="suave peq">Ataque</span><b>${fmt(a.atk)}</b></div>
+          <div class="stat"><span class="suave peq">Defesa</span><b>${fmt(a.def)}</b></div>
+          <div class="stat"><span class="suave peq">Velocidade</span><b>${fmt(a.vel)}</b></div>
+        </div>
+        <div><b>${fn.hab}</b> <span class="suave">— ${fn.habDesc}.</span></div>
+        <div class="linha entre"><span>Nível <b>${h.nv}</b> / ${TL.NIVEL_MAX[h.est]}</span><span class="suave peq">${h.nv < TL.NIVEL_MAX[h.est] ? `custa ${fmt(custo.ouro)} ouro e ${fmt(custo.xp)} xp` : 'nível máximo da estrela'}</span></div>
+        <div class="linha"><button class="b prim" id="bSobe" ${sub.ok ? '' : 'disabled'}>Subir nível</button><button class="b" id="bSobe10" ${sub.ok ? '' : 'disabled'}>Subir até 10x</button>
+          <button class="b" id="bEq">${naEq ? 'Tirar da equipe' : 'Pôr na equipe'}</button></div>
+        <p class="aviso" id="avD">${sub.ok ? '' : esc(sub.motivo)}</p>
+      </div>
+      <div class="cartao">
+        <h3>Evoluir para ${Math.min(h.est + 1, max)}★</h3>
+        ${h.est >= max ? '<p class="suave" style="margin:0">Este herói já está na estrela máxima.</p>' :
+          `<p class="peq suave" style="margin:0">Consome: ${plano.regra ? [plano.regra.copias ? plano.regra.copias + ' cópia ' + h.est + '★ do mesmo herói' : '', plano.regra.mesmaFac ? plano.regra.mesmaFac + ' heróis ' + h.est + '★ de ' + f.nome : ''].filter(Boolean).join(' + ') : ''}.</p>
+          ${plano.ok ? `<p class="peq" style="margin:0">Vai usar: ${[...plano.copias, ...plano.mat].map((x) => esc(TL.DEFS[x.def].nome) + ' ' + x.est + '★ nv' + x.nv).join(', ')}.</p>` : `<p class="peq" style="margin:0;color:var(--ruim)">${esc(plano.motivo)}</p>`}
+          <button class="b prim" id="bEvo" ${plano.ok ? '' : 'disabled'}>Evoluir</button>`}
+      </div>`;
+    retratoGrande($('#cRet'), h.def);
+    $('#bVolta').onclick = () => { heroiAberto = null; render(); };
+    $('#bSobe').onclick = () => { TL.subirNivel(E, h.uid); salva(); render(); };
+    $('#bSobe10').onclick = () => { for (let i = 0; i < 10; i++) if (!TL.subirNivel(E, h.uid).ok) break; salva(); render(); };
+    $('#bEq').onclick = () => {
+      if (naEq) E.equipe = E.equipe.filter((u) => u !== h.uid);
+      else {
+        if (E.equipe.some((u) => TL.heroi(E, u).def === h.def)) return aviso('#avD', 'Já existe um ' + d.nome + ' na equipe.');
+        if (E.equipe.length >= 6) return aviso('#avD', 'A equipe já tem 6 heróis. Tire alguém primeiro.');
+        E.equipe.push(h.uid);
+      }
+      salva(); render();
+    };
+    if ($('#bEvo')) $('#bEvo').onclick = () => { const r = TL.evoluir(E, h.uid); salva(); render(); if (r.ok) aviso('#avD', d.nome + ' agora é ' + r.heroi.est + '★!', true); };
+  }
+  function retratoGrande(cv, def) {
+    const dpr = window.devicePixelRatio || 1; cv.width = 96 * dpr; cv.height = 96 * dpr;
+    const c = cv.getContext('2d'); c.scale(dpr, dpr); const d = TL.DEFS[def];
+    const moldura = () => { if (d.rar) { c.strokeStyle = TL.RARIDADES[d.rar].cor; c.lineWidth = 4; c.beginPath(); c.roundRect(2, 2, 92, 92, 12); c.stroke(); } };
+    if (imgDef(def)) { quandoPronta(imgDef(def), () => { c.clearRect(0, 0, 96, 96); const im = imgDef(def), h = d.recruta ? 78 : 86, w = (h * im.naturalWidth) / im.naturalHeight; c.drawImage(im, 48 - w / 2, 5, w, h); moldura(); }); return; }
+    moldura(); desenhaHeroi(c, 48, 54, 1.25, d, 0, false);
+  }
+
+  // ---------- Invocar ----------
+  let ultimos = [];
+  function telaInvocar() {
+    const ch = TL.chancesDetalhadas();
+    $('#tela').innerHTML = `
+      <div class="cartao">
+        <div class="linha entre"><h2>Invocação comum</h2><span class="suave peq">${E.pergC} pergaminhos</span></div>
+        <p class="peq suave" style="margin:0">Heróis de 1★ a 5★. Ótima fonte de material de fusão.</p>
+        <div class="linha"><button class="b" id="bC1">Invocar 1</button><button class="b" id="bC10">Invocar 10</button></div>
+      </div>
+      <div class="cartao">
+        <div class="linha entre"><h2>Invocação premium</h2><span class="suave peq">${E.pergP} pergaminhos · ${TL.CUSTO_PREMIUM} gemas cada</span></div>
+        <p class="peq suave" style="margin:0">Heróis de 3★ a 5★. Pacote de 10 garante um 4★ ou melhor. 5★ garantido a cada ${TL.PITY} invocações.</p>
+        <div class="linha entre"><span class="peq">Até a garantia: <b>${TL.PITY - E.pity}</b></span></div>
+        <div class="linha"><button class="b prim" id="bP1">Invocar 1</button><button class="b prim" id="bP10">Invocar 10</button></div>
+      </div>
+      <p class="aviso" id="avI"></p>
+      ${ultimos.length ? `<div class="cartao"><h3>Resultado</h3><div class="resultado">${ultimos.map((h) => `<div class="r"><canvas data-def="${h.def}"></canvas><div class="estrelas">${h.est}★</div><div>${esc(TL.DEFS[h.def].nome.split(' ')[0])}</div></div>`).join('')}</div></div>` : ''}
+      <details class="cartao"><summary><b>Ver chances</b></summary>
+        <table><thead><tr><th>Estrelas</th><th>Comum</th><th>Premium</th></tr></thead><tbody>
+        ${[5, 4, 3, 2, 1].map((s) => `<tr><td>${s}★</td><td>${(TL.CHANCE_COMUM[s] || 0).toLocaleString('pt-BR')}%</td><td>${(TL.CHANCE_PREMIUM[s] || 0).toLocaleString('pt-BR')}%</td></tr>`).join('')}
+        </tbody></table>
+        <table><thead><tr><th>Herói 5★ (premium)</th><th>Raridade</th><th>Chance</th></tr></thead><tbody>
+        ${ch.map((x) => `<tr><td>${esc(x.nome)}</td><td>${x.rar}</td><td>${x.chance.toLocaleString('pt-BR', { maximumFractionDigits: 3 })}%</td></tr>`).join('')}
+        </tbody></table>
+        <p class="peq suave" style="margin:0">Na comum, os 5★ seguem a mesma divisão por raridade.</p>
+      </details>`;
+    document.querySelectorAll('.resultado canvas').forEach((cv) => retrato(cv, cv.dataset.def));
+    const faz = (tipo, q) => () => {
+      const r = TL.invocar(E, tipo, q);
+      if (!r.length) return aviso('#avI', tipo === 'comum' ? 'Sem pergaminhos comuns. Vença fases para ganhar mais.' : 'Sem pergaminhos premium nem gemas suficientes.');
+      ultimos = r; salva(); render();
+      const melhor = Math.max(...r.map((h) => h.est));
+      aviso('#avI', melhor === 5 ? 'Um herói 5★ apareceu na taverna!' : r.length + ' heróis invocados.', melhor === 5);
+    };
+    $('#bC1').onclick = faz('comum', 1); $('#bC10').onclick = faz('comum', 10);
+    $('#bP1').onclick = faz('premium', 1); $('#bP10').onclick = faz('premium', 10);
+  }
+
+  // ---------- Navegação ----------
+  function render() {
+    topo();
+    document.querySelectorAll('nav button').forEach((b) => b.setAttribute('aria-current', b.dataset.tela === telaAtual ? 'page' : 'false'));
+    pararAnim();
+    ({ taverna: telaTaverna, campanha: telaCampanha, herois: telaHerois, invocar: telaInvocar })[telaAtual]();
+  }
+  document.querySelectorAll('nav button').forEach((b) => (b.onclick = () => { telaAtual = b.dataset.tela; heroiAberto = null; ultimos = []; window.scrollTo(0, 0); render(); }));
+  setInterval(() => { if (telaAtual === 'taverna' && !document.hidden) { const p = TL.afkPendente(E); const el = document.querySelector('.barra > div'); if (el) el.style.width = (100 * p.min / TL.AFK_MAX_MIN).toFixed(1) + '%'; } }, 5000);
+  render();
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Taverna Idle",
+  "short_name": "Taverna Idle",
+  "description": "Idle RPG de coleção de heróis: defenda a Taverna do Fim do Mundo dos monstros da fenda.",
+  "lang": "pt-BR",
+  "id": "./app.html",
+  "start_url": "./app.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#16130E",
+  "theme_color": "#16130E",
+  "categories": ["games"],
+  "icons": [
+    { "src": "icones/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icones/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icones/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
