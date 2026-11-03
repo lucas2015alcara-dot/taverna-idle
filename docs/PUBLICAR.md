@@ -49,3 +49,4 @@ Não precisa gerar o app de novo para cada mudança: o app abre o site, então b
 - Xiaomi GetApps pede verificação com documentos; Samsung Galaxy Store exige status de vendedor comercial e DUNS. Amazon fechou a loja para celulares Android em 2025.
 - Teste grátis: mandar o link do GitHub Pages e instalar pelo Chrome ("Adicionar à tela inicial"); não é APK, não depende da verificação.
 - Portais web (Playgama, CrazyGames, GameDistribution, itch.io): exigem versão própria com o SDK do portal e sem invocação paga. Fica para depois.
+- TikTok Minis (pesquisa de 02/11/2026): conta por organização e verificação de empresa registrada para monetizar; não aceita jogo em HTML/DOM (só Cocos Creator, LayaAir ou Unity), pacote até 30 MB com principal de 4 MB. Brasil liberado sem requisito extra. Decisão: usar o TikTok só para divulgar (vídeos de invocação, ultimates, evolução) com link na bio.
