@@ -52,10 +52,30 @@ for (let dia = 1; dia <= 14; dia++) {
 }
 console.log('fase por dia:', JSON.stringify(marcos));
 console.log('equipe:', bot.equipe.map(u => { const h = TL.heroi(bot, u); return TL.DEFS[h.def].nome + ' ' + h.est + '★ nv' + h.nv; }).join(', '));
-assert(marcos[1] >= 5 && marcos[1] <= 14, 'dia 1 entre fase 5 e 14');
-assert(marcos[14] >= 20, 'dia 14 passa da fase 20');
+assert(marcos[1] >= 8 && marcos[1] <= 18, 'dia 1 entre fase 8 e 18');
+assert(marcos[14] >= 25, 'dia 14 passa da fase 25');
 // serialização
 const t = TL.serializa(bot); const b2 = TL.carrega(t);
 assert(b2 && b2.herois.length === bot.herois.length, 'salvar/carregar');
 assert(TL.carrega('{lixo') === null, 'save corrompido não quebra');
 console.log(process.exitCode ? 'COM FALHAS' : 'tudo ok');
+// calendários
+{
+  const e = TL.novoEstado(); const t0 = Date.parse('2026-11-05T10:00');
+  const ids = TL.calendarios(e, t0).map(c => c.id);
+  assert(ids.includes('novato') && ids.includes('mensal') && !ids.includes('natal2026'), 'calendários ativos fora do Natal');
+  assert(TL.resgataCalendario(e, 'novato', null, t0).ok, 'resgata dia 1');
+  assert(!TL.resgataCalendario(e, 'novato', null, t0 + 3600e3).ok, 'só 1x por dia');
+  // pula 3 dias: continua do dia 2 (não perde)
+  const r2 = TL.resgataCalendario(e, 'novato', null, t0 + 4 * 86400e3);
+  assert(r2.ok && r2.dia === 2, 'dia perdido continua de onde parou');
+  for (let d = 5; d <= 9; d++) TL.resgataCalendario(e, 'novato', 'morgrath', t0 + d * 86400e3);
+  assert(e.herois.some(h => h.def === 'morgrath' && h.est === 5), 'dia 7: herói à escolha');
+  assert(!TL.calendarios(e, t0 + 10 * 86400e3).some(c => c.id === 'novato'), 'novato some depois do dia 7');
+  assert(TL.calendarios(e, Date.parse('2026-12-20T10:00')).some(c => c.id === 'natal2026'), 'evento de Natal aparece na data');
+  const e2 = TL.novoEstado(); const p7 = TL.resgataCalendario(e2, 'novato', null, t0);
+  assert(p7.ok, 'ok'); for (let d = 1; d < 6; d++) TL.resgataCalendario(e2, 'novato', null, t0 + d * 86400e3);
+  const sem = TL.resgataCalendario(e2, 'novato', null, t0 + 6 * 86400e3);
+  assert(!sem.ok && sem.precisaEscolha, 'dia 7 exige escolha');
+}
+console.log(process.exitCode ? 'COM FALHAS (calendário)' : 'calendários ok');

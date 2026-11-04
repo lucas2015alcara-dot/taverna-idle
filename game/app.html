@@ -326,6 +326,34 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
 @media (max-height: 380px) { .painelFase { gap: 4px; padding: 0 4px 6px; } .pfTopo h2 { font-size: 18px; } .pfRec { padding: 3px 8px 4px; } .pfRec div { font-size: 13px; } .pfRec .ico { width: 18px; height: 18px; }
   .bLutar { font-size: 18px !important; padding: 5px 12px 7px !important; } .pfIni { grid-template-columns: repeat(6, minmax(0, 38px)); } .pfLinha { font-size: 11px; } .bLutar .ico { width: 22px; height: 22px; } .no { width: 32px; height: 32px; } .no.atual { width: 40px; height: 40px; } .no.chefe { width: 46px; height: 46px; } }
 @media (orientation: portrait) { .camp { flex-direction: column; height: auto !important; } .mapa { min-height: 60vw; } .painelFase { width: auto; border-left: 0; border-top: 3px solid var(--ourox); } }
+.bCal { position: absolute; left: max(10px, env(safe-area-inset-left, 0px)); top: 10px; z-index: 3; display: flex; align-items: center; gap: 4px; cursor: pointer;
+  font: 400 15px var(--display); color: #FFF3D6; text-shadow: 0 1px 0 #000; padding: 3px 6px 4px; border-style: solid; border-width: 0 14px;
+  border-image: url(assets/ui/etiqueta.webp) 28 34 fill / 13px 15px stretch; background: none; filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); }
+.bCal .ico { width: 24px; height: 24px; }
+.ponto-vermelho { position: absolute; right: -10px; top: -4px; width: 12px; height: 12px; border-radius: 50%; background: #E8402E; border: 2px solid #FFF3D6; animation: pulsaN 1.4s ease-in-out infinite; }
+.calAba .ponto-vermelho { right: -4px; top: -4px; }
+.modalCaixa.larga { width: min(860px, 100%); }
+.calAbas { display: flex; gap: 6px; flex-wrap: wrap; }
+.calAba { position: relative; font: 400 14px var(--display); color: var(--suave); background: var(--madeira2); border: 2px solid #2A170B; border-radius: 10px; padding: 4px 12px 5px; cursor: pointer; }
+.calAba.ativa { color: #fff; border-color: var(--ourox); box-shadow: 0 0 8px rgba(242,193,78,.4); }
+.calGrade { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; }
+.calGrade.n7 { grid-template-columns: repeat(7, minmax(0, 1fr)); } .calGrade.n11 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.calDia { position: relative; min-height: 58px; border-radius: 10px; padding: 3px 3px 4px; background: rgba(20,10,4,.5); border: 2px solid #4A2B16; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.calGrade.n7 .calDia { min-height: 92px; }
+.calDia small { font: 800 9px var(--corpo); color: #CDBE9F; text-transform: uppercase; letter-spacing: .4px; }
+.calItens { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+.calItens span { display: inline-flex; align-items: center; gap: 2px; }
+.calItens .ico { width: 20px; height: 20px; } .calGrade.n7 .calItens .ico { width: 30px; height: 30px; }
+.calItens b { font: 400 12px var(--display); color: #fff; text-shadow: 0 1px 0 #000; white-space: nowrap; } .calGrade.n7 .calItens b { font-size: 15px; }
+.calDia.especial { border-color: #B57BFF; background: radial-gradient(circle, rgba(140,80,220,.45), rgba(20,10,4,.6)); }
+.calDia.especial b { font-size: 10px; text-align: center; white-space: normal; line-height: 1.05; }
+.calDia.feito { opacity: .45; } .calDia.feito::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; font: 400 28px var(--display); color: #8EE08A; text-shadow: 0 2px 2px #000; }
+.calDia.hoje { border-color: var(--ouro); box-shadow: 0 0 12px rgba(255,214,107,.7); animation: pulsaDia 1.6s ease-in-out infinite; }
+.calDia.prox { border-style: dashed; border-color: var(--ourox); }
+@keyframes pulsaDia { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.calRodape { flex-wrap: nowrap; gap: 10px; } .calRodape .peq { flex: 1; }
+.escolhaH { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+@media (max-height: 380px) { .calDia { min-height: 50px; } .calGrade.n7 .calDia { min-height: 80px; } .calItens .ico { width: 17px; height: 17px; } }
 @media (prefers-reduced-motion: reduce) { .raio, .artGrande { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .brilho, .selo.cheio { animation: none; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -523,6 +551,7 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
         <div class="brilho bau" id="gBau"></div>
         ${PONTOS.map((pt) => `<button class="ponto" data-id="${pt.id}" aria-label="${pt.nome}"></button>
           <span class="etiqueta${pt.breve ? ' breve' : ''}" data-et="${pt.id}">${pt.nome}${pt.breve ? ' <small>em breve</small>' : ''}</span>`).join('')}
+        <button class="bCal" id="bCal" aria-label="Calendário de recompensas">${ico('estrela-especial')}<span>Calendário</span><i class="ponto-vermelho" id="calPonto" hidden></i></button>
         <button class="selo" id="afkSelo" data-et="selo"><span>Ganhos AFK</span><b id="afkOuro">${fmt(p.ouro)}</b></button>
         <p class="hubAviso" id="avTav" role="status"></p>
       </div>
@@ -549,6 +578,10 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
     if (img.complete) posiciona(); else img.addEventListener('load', posiciona, { once: true });
     posiciona(); addEventListener('resize', posiciona); telaSai = () => removeEventListener('resize', posiciona);
     atualizaSelo();
+    const pc = $('#calPonto'); if (pc) pc.hidden = !TL.temCalendario(E);
+    $('#bCal').onclick = () => abreCalendario();
+    // abre sozinho uma vez por dia quando tem recompensa
+    try { const k = 'taverna-cal-auto', h = TL.hojeStr(); if (TL.temCalendario(E) && localStorage.getItem(k) !== h) { localStorage.setItem(k, h); setTimeout(() => { if ($('#modal') && $('#modal').hidden) abreCalendario(); }, 500); } } catch (e) {}
 
     const vai = (t) => { telaAtual = t; heroiAberto = null; ultimos = []; render(); };
     hub.querySelectorAll('.ponto').forEach((b) => (b.onclick = () => {
@@ -568,8 +601,55 @@ button.b.verde { background: linear-gradient(180deg, #9BE35A, #4FB52E 55%, #2E8A
     s.classList.toggle('cheio', p.cheio);
     $('#gBau').classList.toggle('forte', p.min > 60);
   }
-  function abreModal(html) { $('#modalCaixa').innerHTML = html + '<button class="b fechar" id="bFechar" aria-label="Fechar">✕</button>'; $('#modal').hidden = false; $('#bFechar').onclick = fechaModal; }
+  function abreModal(html) { $('#modalCaixa').classList.remove('larga'); $('#modalCaixa').innerHTML = html + '<button class="b fechar" id="bFechar" aria-label="Fechar">✕</button>'; $('#modal').hidden = false; $('#bFechar').onclick = fechaModal; }
   function fechaModal() { const m = $('#modal'); if (m) m.hidden = true; }
+  // ---------- Calendários de login ----------
+  const ICO_REC = { ouro: 'ouro', xp: 'xp', gemas: 'gema', pergC: 'perg-comum', pergP: 'perg-premium' };
+  const itensRec = (r) => [...Object.keys(ICO_REC).filter((k) => r[k]).map((k) => ({ ic: ICO_REC[k], q: r[k] })),
+    ...(r.heroi ? [{ ic: 'estrela-especial', q: r.heroi === 'escolha' ? '5★ à escolha' : '5★ surpresa', heroi: true }] : [])];
+  const fmtCurto = (v) => typeof v === 'number' ? (v >= 1000 ? (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'mil' : String(v)) : v;
+  let calAba = null;
+  function abreCalendario(escolhendo) {
+    const cals = TL.calendarios(E);
+    if (!cals.find((c) => c.id === calAba)) calAba = (cals.find((c) => c.pode) || cals[0]).id;
+    const c = cals.find((x) => x.id === calAba);
+    const hojeIdx = c.feitos;
+    const prox = c.dias[hojeIdx];
+    if (escolhendo) {
+      abreModal(`<h2>Escolha seu herói 5★</h2>
+        <div class="escolhaH">${TL.CAMPEOES.map((h) => { const d = TL.DEFS[h.id], f = TL.FACCOES[d.fac];
+          return `<button class="carta escolhe" data-h="${h.id}" style="--fac:${f.cor};--facc:${f.claro};--borda:${COR_RAR[d.rar]}"><span class="cfundo"></span><img class="cart" src="${artDe(h.id)}" alt=""><img class="cfac" src="assets/ui/fac-${d.fac}.webp" alt=""><span class="cest">${estrelasIcone(5)}</span><span class="cnome">${esc(d.nome)}</span></button>`; }).join('')}</div>
+        <p class="peq suave" style="margin:0">Toque no herói que você quer receber.</p>`);
+      $('#modalCaixa').classList.add('larga');
+      document.querySelectorAll('.escolhe').forEach((b) => (b.onclick = () => resgata(b.dataset.h)));
+      return;
+    }
+    abreModal(`<h2>Recompensas diárias</h2>
+      ${cals.length > 1 ? `<div class="calAbas">${cals.map((x) => `<button class="calAba${x.id === calAba ? ' ativa' : ''}" data-c="${x.id}">${esc(x.nome)}${x.pode ? '<i class="ponto-vermelho"></i>' : ''}</button>`).join('')}</div>` : ''}
+      <div class="calGrade n${c.dias.length}">${c.dias.map((r, i) => {
+        const est = i < hojeIdx ? 'feito' : i === hojeIdx && c.pode ? 'hoje' : i === hojeIdx ? 'prox' : '';
+        const it = itensRec(r);
+        return `<div class="calDia ${est}${r.heroi ? ' especial' : ''}"><small>Dia ${i + 1}</small>
+          <div class="calItens">${it.map((x) => `<span>${ico(x.ic)}<b>${fmtCurto(x.q)}</b></span>`).join('')}</div></div>`;
+      }).join('')}</div>
+      <div class="linha entre calRodape">
+        <span class="peq suave">${c.id === 'novato' ? 'Só para novos aventureiros: 7 dias.' : c.ciclo ? 'Recomeça depois do dia 30.' : 'Evento até ' + c.fim.split('-').reverse().slice(0, 2).join('/') + '.'} Perdeu um dia? Continua de onde parou.</span>
+        <button class="b prim" id="bCalPega" ${c.pode ? '' : 'disabled'}>${c.pode ? 'Receber dia ' + (hojeIdx + 1) : 'Volte amanhã'}</button>
+      </div>
+      <p class="aviso" id="avCal"></p>`);
+    $('#modalCaixa').classList.add('larga');
+    document.querySelectorAll('.calAba').forEach((b) => (b.onclick = () => { calAba = b.dataset.c; abreCalendario(); }));
+    $('#bCalPega').onclick = () => { if (prox && prox.heroi === 'escolha') abreCalendario(true); else resgata(null); };
+  }
+  function resgata(escolha) {
+    const r = TL.resgataCalendario(E, calAba, escolha);
+    if (!r.ok) return aviso('#avCal', r.motivo);
+    salva(); topo(); SOM.toca(r.heroi ? 'revelacao-5' : 'moedas');
+    const pc = $('#calPonto'); if (pc) pc.hidden = !TL.temCalendario(E);
+    abreCalendario();
+    aviso('#avCal', r.heroi ? TL.DEFS[r.heroi.def].nome + ' 5★ entrou para a taverna!' : 'Dia ' + r.dia + ' recebido!', true);
+  }
+
   function abreAfk() {
     const p = TL.afkPendente(E), tx = TL.taxaAfk(E);
     const h = Math.floor(p.min / 60), m = Math.floor(p.min % 60);

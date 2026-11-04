@@ -156,13 +156,23 @@ Heróis sem uso viram fragmentos para a loja da taverna.
 | Pergaminho premium | Marcos da campanha, eventos | Invocação premium |
 | Fragmentos | Reciclar heróis | Loja da taverna |
 
-### Eventos e calendário (decidido em 02/11)
+### Eventos e calendários (revisado em 04/11)
 
-- **Evento semanal:** ao fim de cada semana, 2 pergaminhos premium e 300 gemas.
-- **Calendário de login (30 dias):** 1 pergaminho premium nos dias 5, 10, 15, 20 e 25; 30 gemas nos demais dias; no dia 30, um herói 5★ aleatório.
-- **Ritmo base um pouco mais generoso:** 180 gemas por dia.
+Diretriz do Lucas: jogo generoso em recompensas para ninguém desistir cedo, sem ficar fácil demais; eventos guiam o jogador grátis por um caminho mais tranquilo.
 
-Resultado no simulador (`tools/economia`, jogador grátis): 1º herói 5★ por volta do dia 5; cerca de 50% chegam a um 6★ em 30 dias e quase todos em 60 dias; cerca de 66 invocações premium por mês.
+- **Calendários rodam juntos:** novato (7 dias), mensal (30 dias) e eventos com data (ex.: Natal). Cada um pode ser recebido 1x por dia.
+- **Dia perdido não se perde:** o calendário continua de onde parou.
+- **Novato (7 dias):** 1) 10 perg. comuns + 5.000 ouro · 2) 300 gemas + 3.000 XP · 3) 2 perg. premium · 4) 10.000 ouro + 6.000 XP · 5) 3 perg. premium · 6) 500 gemas · 7) **herói 5★ à escolha**.
+- **Mensal (30 dias, recomeça):** dias 5/10/15/20/25: 2 perg. premium · dias 7/14/21/28: 5 perg. comuns + 60 gemas · outros pares: 80 gemas · ímpares: ouro e XP crescentes (2.200/1.320 no dia 1 até 7.800/4.680 no dia 29) · dia 30: herói 5★ surpresa.
+- **Evento de Natal (Festival de Inverno, 15/12/2026 a 06/01/2027):** 11 dias com gemas, pergaminhos, ouro, XP e herói 5★ à escolha no último dia. Novos eventos entram na lista `EVENTOS` do `logic.js` com data de início e fim.
+- **Evento semanal (2 perg. premium + 300 gemas):** decidido, ainda não implementado.
+- **Tela:** botão "Calendário" na taverna (ponto vermelho quando há recompensa), abre sozinho 1x por dia; abas por calendário; escolha do herói em cartas.
+
+### Ajuste de dificuldade (04/11)
+- Ganho AFK dobrado: ouro 10 + 4×fase/min, XP 8 + 3×fase/min.
+- Primeira vitória da fase: ouro 150 + 60×fase, XP 100 + 40×fase, 60 gemas (chefe 200 + 1 perg. premium).
+- Inimigos um pouco mais fracos: força base 0,42 (era 0,5).
+- Resultado no bot (jogador grátis com calendários): fase 10 (1º chefe) em ~1 hora de jogo; dia 1 ≈ fase 15; dia 3 ≈ 19–22; as 30 fases atuais em ~5 dias. Quando entrarem mais capítulos, a curva dos novos fica mais lenta.
 
 ## Ganhos idle e modos de jogo
 

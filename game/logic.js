@@ -160,7 +160,7 @@
   };
   const TOTAL_FASES = 30;
   // força dos inimigos: acompanha o nível que o jogador precisa ter (~3,5 níveis por fase)
-  let K = { base: 0.5, nvPorFase: 3.5, cap: 0.12 };
+  let K = { base: 0.42, nvPorFase: 3.5, cap: 0.12 };
   function forcaFase(n) { const cap = Math.ceil(n / 10) - 1; return K.base * (1 + 0.06 * (K.nvPorFase * n - 1)) * (1 + K.cap * cap); }
   function infoFase(n) { // n = 1..30
     const cap = Math.ceil(n / 10);
@@ -190,7 +190,7 @@
     return lista;
   }
   function recompensaFase(n) {
-    return { ouro: 60 + n * 25, xp: 40 + n * 18, gemas: infoFase(n).chefe ? 150 : 50, pergC: n % 3 === 0 ? 2 : 0, pergP: infoFase(n).chefe ? 1 : 0 };
+    return { ouro: 150 + n * 60, xp: 100 + n * 40, gemas: infoFase(n).chefe ? 200 : 60, pergC: n % 3 === 0 ? 2 : 0, pergP: infoFase(n).chefe ? 1 : 0 };
   }
 
   // ---------- Combate ----------
@@ -286,7 +286,7 @@
 
   // ---------- AFK ----------
   const AFK_MAX_MIN = 12 * 60;
-  function taxaAfk(e) { const s = Math.max(1, e.fase); return { ouro: 5 + 2 * s, xp: 4 + 1.5 * s }; }
+  function taxaAfk(e) { const s = Math.max(1, e.fase); return { ouro: 10 + 4 * s, xp: 8 + 3 * s }; }
   function afkPendente(e, agora = Date.now()) {
     const min = Math.min(AFK_MAX_MIN, Math.max(0, (agora - e.ultimoAfk) / 60000));
     const t = taxaAfk(e);
@@ -356,6 +356,68 @@
       const mesmos = CAMPEOES.filter((x) => x.rar === c.rar).length;
       return { nome: c.nome, rar: RARIDADES[c.rar].nome, chance: (p5 * RARIDADES[c.rar].chance) / 100 / mesmos };
     });
+  }
+
+
+  // ---------- Calendários de login (rodam juntos; dia perdido não se perde: continua de onde parou) ----------
+  // Recompensa: { ouro, xp, gemas, pergC, pergP, heroi: 'escolha' | 'aleatorio' (5★) }
+  const CAL_NOVATO = [
+    { pergC: 10, ouro: 5000 },
+    { gemas: 300, xp: 3000 },
+    { pergP: 2 },
+    { ouro: 10000, xp: 6000 },
+    { pergP: 3 },
+    { gemas: 500 },
+    { heroi: 'escolha' },
+  ];
+  function diaMensal(d) { // d = 1..30
+    if (d === 30) return { heroi: 'aleatorio' };
+    if (d % 5 === 0) return { pergP: 2 };
+    if (d % 7 === 0) return { pergC: 5, gemas: 60 };
+    if (d % 2 === 0) return { gemas: 80 };
+    return { ouro: 2000 + 200 * d, xp: 1200 + 120 * d };
+  }
+  const CAL_MENSAL = Array.from({ length: 30 }, (_, i) => diaMensal(i + 1));
+  // Eventos com data (calendário sazonal). Datas no horário do aparelho, formato AAAA-MM-DD, fim incluso.
+  const EVENTOS = [
+    { id: 'natal2026', nome: 'Festival de Inverno', inicio: '2026-12-15', fim: '2027-01-06', dias: [
+      { gemas: 200 }, { pergC: 5 }, { pergP: 1 }, { ouro: 15000 }, { gemas: 300 },
+      { pergP: 2 }, { xp: 12000 }, { pergC: 10 }, { gemas: 500 }, { pergP: 3 }, { heroi: 'escolha' },
+    ] },
+  ];
+  const hojeStr = (agora = Date.now()) => { const d = new Date(agora); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  function calendarios(e, agora = Date.now()) {
+    const hoje = hojeStr(agora), cal = (e.cal = e.cal || {}), lista = [];
+    const st = (id) => (cal[id] = cal[id] || { dia: 0, ultimo: '' });
+    const n = st('novato');
+    if (n.dia < CAL_NOVATO.length) lista.push({ id: 'novato', nome: 'Boas-vindas', dias: CAL_NOVATO, feitos: n.dia, ultimo: n.ultimo, ciclo: false });
+    const m = st('mensal');
+    lista.push({ id: 'mensal', nome: 'Calendário mensal', dias: CAL_MENSAL, feitos: m.dia % 30, ultimo: m.ultimo, ciclo: true });
+    for (const ev of EVENTOS) {
+      if (hoje < ev.inicio || hoje > ev.fim) continue;
+      const s2 = st(ev.id);
+      if (s2.dia < ev.dias.length) lista.push({ id: ev.id, nome: ev.nome, dias: ev.dias, feitos: s2.dia, ultimo: s2.ultimo, ciclo: false, fim: ev.fim });
+    }
+    lista.forEach((c) => (c.pode = c.ultimo !== hoje && c.feitos < c.dias.length));
+    return lista;
+  }
+  const temCalendario = (e, agora) => calendarios(e, agora).some((c) => c.pode);
+  function ganha(e, rec, escolha, r) {
+    e.ouro += rec.ouro || 0; e.xp += rec.xp || 0; e.gemas += rec.gemas || 0; e.pergC += rec.pergC || 0; e.pergP += rec.pergP || 0;
+    if (rec.heroi) {
+      const def = rec.heroi === 'escolha' && CAMPEOES.some((c) => c.id === escolha) ? escolha : heroiDe(5, r);
+      const h = criaHeroi(e, def, 5); autoEquipe(e, true); return h;
+    }
+    return null;
+  }
+  function resgataCalendario(e, id, escolha, agora = Date.now()) {
+    const c = calendarios(e, agora).find((x) => x.id === id);
+    if (!c || !c.pode) return { ok: false, motivo: 'Já recebido hoje. Volte amanhã!' };
+    const rec = c.dias[c.feitos];
+    if (rec.heroi === 'escolha' && !CAMPEOES.some((x) => x.id === escolha)) return { ok: false, motivo: 'Escolha um herói.', precisaEscolha: true };
+    const h = ganha(e, rec, escolha, rngDo(e));
+    e.cal[id].dia++; e.cal[id].ultimo = hojeStr(agora);
+    return { ok: true, rec, heroi: h, dia: c.feitos + 1 };
   }
 
   // ---------- Fusão ----------
@@ -429,6 +491,7 @@
     infoFase, inimigosDaFase, recompensaFase, montaLado, batalha, lutarFase,
     taxaAfk, afkPendente, coletaAfk, podeSubir, subirNivel, invocar, chancesDetalhadas,
     forcaFase, ajustaFases: (k) => Object.assign(K, k),
+    CAL_NOVATO, CAL_MENSAL, EVENTOS, calendarios, temCalendario, resgataCalendario, hojeStr,
     regraFusao, planoFusao, evoluir, fundirBasicos, serializa, carrega, criaRng,
   };
   root.TL = API;
